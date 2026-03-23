@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import LanguageSwitcher from '../components/LanguageSwitcher.astro';
+import { type Lang, ui, languages, getLangPrefix } from '../i18n/translations';
 
 interface Props {
   title: string;
@@ -7,6 +9,7 @@ interface Props {
   image?: string;
   math?: boolean;
   heroLayout?: boolean;
+  lang?: Lang;
 }
 
 const {
@@ -15,13 +18,24 @@ const {
   image,
   math = false,
   heroLayout = false,
+  lang = 'en',
 } = Astro.props;
+
+const prefix = getLangPrefix(lang);
+const T = ui[lang];
+const htmlLang = languages[lang].htmlLang;
+
+const navLinks = [
+  { href: prefix ? `${prefix}/` : '/',                label: T['nav.home'] },
+  { href: `${prefix}/blog`,                           label: T['nav.blog'] },
+  { href: `${prefix}/projects`,                       label: T['nav.projects'] },
+];
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={htmlLang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -46,30 +60,47 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       heroLayout ? 'bg-transparent' : 'bg-[#0a0a0f]/90 backdrop-blur-md border-b border-white/5'
     ]} id="site-header">
       <nav class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-        <a href="/" class="font-bold text-xl text-white tracking-tight hover:opacity-80 transition-opacity">
+        <a href={prefix ? `${prefix}/` : '/'} class="font-bold text-xl text-white tracking-tight hover:opacity-80 transition-opacity">
           MBatu<span class="text-indigo-400">.</span>
         </a>
+
         <!-- Desktop nav -->
         <ul class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-          <li><a href="/" class="hover:text-white transition-colors">Home</a></li>
-          <li><a href="/blog" class="hover:text-white transition-colors">Blog</a></li>
-          <li><a href="/projects" class="hover:text-white transition-colors">Projects</a></li>
-          <li><a href="/about" class="gradient-button !min-w-0 !px-5 !py-2 !text-sm !rounded-full">About</a></li>
+          {navLinks.map(link => (
+            <li><a href={link.href} class="hover:text-white transition-colors">{link.label}</a></li>
+          ))}
+          <li>
+            <a href={`${prefix}/about`} class="gradient-button !min-w-0 !px-5 !py-2 !text-sm !rounded-full">
+              {T['nav.about']}
+            </a>
+          </li>
+          <li>
+            <LanguageSwitcher currentLang={lang} />
+          </li>
         </ul>
-        <!-- Hamburger button (mobile) -->
-        <button id="menu-toggle" class="md:hidden flex flex-col gap-1.5 p-2 text-slate-300 hover:text-white" aria-label="Toggle menu" aria-expanded="false">
-          <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar1"></span>
-          <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar2"></span>
-          <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar3"></span>
-        </button>
+
+        <!-- Mobile right side: language switcher + hamburger -->
+        <div class="md:hidden flex items-center gap-2">
+          <LanguageSwitcher currentLang={lang} />
+          <button id="menu-toggle" class="flex flex-col gap-1.5 p-2 text-slate-300 hover:text-white" aria-label="Toggle menu" aria-expanded="false">
+            <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar1"></span>
+            <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar2"></span>
+            <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar3"></span>
+          </button>
+        </div>
       </nav>
+
       <!-- Mobile dropdown menu -->
       <div id="mobile-menu" class="md:hidden hidden bg-[#0a0a0f]/95 backdrop-blur-md border-b border-white/5">
         <ul class="flex flex-col px-6 py-4 gap-4 text-sm font-medium text-slate-300">
-          <li><a href="/" class="block py-2 hover:text-white transition-colors">Home</a></li>
-          <li><a href="/blog" class="block py-2 hover:text-white transition-colors">Blog</a></li>
-          <li><a href="/projects" class="block py-2 hover:text-white transition-colors">Projects</a></li>
-          <li><a href="/about" class="gradient-button inline-block !min-w-0 !px-5 !py-2 !text-sm !rounded-full mt-1">About</a></li>
+          {navLinks.map(link => (
+            <li><a href={link.href} class="block py-2 hover:text-white transition-colors">{link.label}</a></li>
+          ))}
+          <li>
+            <a href={`${prefix}/about`} class="gradient-button inline-block !min-w-0 !px-5 !py-2 !text-sm !rounded-full mt-1">
+              {T['nav.about']}
+            </a>
+          </li>
         </ul>
       </div>
     </header>
@@ -86,7 +117,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <footer class="border-t border-white/5 mt-20">
       <div class="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-        <span>© {new Date().getFullYear()} MBatu — Aerospace & CFD Research</span>
+        <span>© {new Date().getFullYear()} MBatu — {T['footer.rights']}</span>
         <div class="flex gap-6">
           <a href="https://github.com" class="hover:text-slate-300 transition-colors" target="_blank" rel="noopener">GitHub</a>
           <a href="https://linkedin.com" class="hover:text-slate-300 transition-colors" target="_blank" rel="noopener">LinkedIn</a>

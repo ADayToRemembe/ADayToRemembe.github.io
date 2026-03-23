@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { type Lang, ui } from '../../../i18n/translations';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'tr' } },
+    { params: { lang: 'de' } },
+    { params: { lang: 'ru' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const T = ui[lang];
+
+const projects = (await getCollection('projects'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title={`${T['projects.heading']} — MBatu`} description={T['projects.subtitle']} lang={lang}>
+  <div class="mb-10">
+    <h1 class="text-3xl font-bold text-white mb-2">{T['projects.heading']}</h1>
+    <p class="text-slate-400">{T['projects.subtitle']}</p>
+  </div>
+
+  <div class="grid gap-4 sm:grid-cols-2">
+    {projects.map((project) => (
+      <PostCard
+        title={project.data.title}
+        description={project.data.description}
+        slug={project.id}
+        pubDate={project.data.pubDate}
+        tags={project.data.tags}
+        collection="projects"
+      />
+    ))}
+  </div>
+
+  {projects.length === 0 && (
+    <p class="text-slate-500 text-center py-16">{T['projects.empty']}</p>
+  )}
+</BaseLayout>

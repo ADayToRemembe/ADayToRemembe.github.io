@@ -1,0 +1,94 @@
+---
+import { type Lang, languages } from '../i18n/translations';
+
+interface Props {
+  currentLang: Lang;
+}
+
+const { currentLang } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+function getTargetUrl(targetLang: Lang): string {
+  // Strip existing lang prefix (tr, de, ru) from the current path
+  const cleanPath = currentPath.replace(/^\/(tr|de|ru)(?=\/|$)/, '') || '/';
+  if (targetLang === 'en') return cleanPath || '/';
+  return `/${targetLang}${cleanPath === '/' ? '' : cleanPath}` || `/${targetLang}`;
+}
+
+const current = languages[currentLang];
+---
+
+<div class="relative" id="lang-switcher">
+  <!-- Trigger button -->
+  <button
+    id="lang-button"
+    class="flex items-center gap-1.5 rounded-xl border border-amber-600/50 bg-slate-800/40 px-2.5 py-1.5 hover:border-amber-500/80 hover:bg-slate-700/50 transition-all duration-200"
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    aria-label="Select language"
+  >
+    <span class="text-lg leading-none select-none">{current.flag}</span>
+    <!-- Desktop: show language name + chevron -->
+    <span class="hidden md:inline text-xs font-medium text-slate-300">{current.nativeName}</span>
+    <svg class="hidden md:block w-3 h-3 text-slate-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </button>
+
+  <!-- Dropdown -->
+  <ul
+    id="lang-dropdown"
+    role="listbox"
+    aria-label="Language selection"
+    class="absolute right-0 top-full mt-2 w-38 min-w-[9rem] rounded-xl bg-[#0f0f18] border border-white/10 shadow-2xl hidden z-50 py-1 overflow-hidden"
+  >
+    {(Object.keys(languages) as Lang[]).map((lang) => (
+      <li role="option" aria-selected={lang === currentLang}>
+        <a
+          href={getTargetUrl(lang)}
+          class:list={[
+            'flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors',
+            lang === currentLang
+              ? 'bg-indigo-600/20 text-indigo-300 font-medium'
+              : 'text-slate-300 hover:bg-slate-800/80 hover:text-white',
+          ]}
+        >
+          <span class="text-base leading-none select-none">{languages[lang].flag}</span>
+          <span>{languages[lang].nativeName}</span>
+          {lang === currentLang && (
+            <svg class="ml-auto w-3.5 h-3.5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<script>
+  const switcher = document.getElementById('lang-switcher');
+  const button   = document.getElementById('lang-button');
+  const dropdown = document.getElementById('lang-dropdown');
+
+  button?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !dropdown?.classList.contains('hidden');
+    dropdown?.classList.toggle('hidden', isOpen);
+    button.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!switcher?.contains(e.target as Node)) {
+      dropdown?.classList.add('hidden');
+      button?.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      dropdown?.classList.add('hidden');
+      button?.setAttribute('aria-expanded', 'false');
+    }
+  });
+</script>

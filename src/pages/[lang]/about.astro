@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { type Lang, ui } from '../../i18n/translations';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'tr' } },
+    { params: { lang: 'de' } },
+    { params: { lang: 'ru' } },
+  ];
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const T = ui[lang];
+---
+
+<BaseLayout
+  title={`${T['about.heading']} — MBatu`}
+  description={T['about.bio']}
+  lang={lang}
+>
+  <div class="max-w-2xl">
+    <h1 class="text-3xl font-bold text-white mb-8">{T['about.heading']}</h1>
+
+    <div class="prose">
+      <p>{T['about.bio']}</p>
+
+      <h2>{T['about.interests.heading']}</h2>
+      <ul>
+        <li>{T['about.interests.1']}</li>
+        <li>{T['about.interests.2']}</li>
+        <li>{T['about.interests.3']}</li>
+        <li>{T['about.interests.4']}</li>
+      </ul>
+
+      <h2>{T['about.tools.heading']}</h2>
+      <ul>
+        <li>{T['about.tools.1']}</li>
+        <li>{T['about.tools.2']}</li>
+        <li>{T['about.tools.3']}</li>
+        <li>{T['about.tools.4']}</li>
+      </ul>
+
+      <h2>{T['about.contact.heading']}</h2>
+      <p>
+        {T['about.contact.text']} <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>{' '}
+        {T['about.contact.or']} <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>.
+      </p>
+    </div>
+  </div>
+</BaseLayout>
