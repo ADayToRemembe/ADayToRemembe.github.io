@@ -1,0 +1,121 @@
+---
+interface Props {
+  postSlug: string;
+}
+
+const { postSlug } = Astro.props;
+---
+
+<section id="comments" data-post-slug={postSlug}>
+  <h3 class="text-xl font-semibold text-white mb-6">Comments</h3>
+
+  <!-- Comment list -->
+  <div id="comments-list" class="space-y-4 mb-8">
+    <p class="text-slate-500 text-sm" id="comments-loading">Loading comments...</p>
+  </div>
+
+  <!-- Comment form -->
+  <form id="comment-form" class="space-y-4 bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+    <h4 class="text-base font-medium text-white">Leave a comment</h4>
+    <div>
+      <label for="author-name" class="block text-sm text-slate-400 mb-1">Name</label>
+      <input
+        type="text"
+        id="author-name"
+        required
+        maxlength="60"
+        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
+        placeholder="Your name"
+      />
+    </div>
+    <div>
+      <label for="comment-content" class="block text-sm text-slate-400 mb-1">Comment</label>
+      <textarea
+        id="comment-content"
+        required
+        maxlength="2000"
+        rows="4"
+        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+        placeholder="Write your comment..."
+      ></textarea>
+    </div>
+    <button
+      type="submit"
+      class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors"
+    >
+      Post Comment
+    </button>
+    <p id="form-status" class="text-sm hidden"></p>
+  </form>
+</section>
+
+<script>
+  import { supabase, type Comment } from '../lib/supabase';
+
+  const section = document.getElementById('comments') as HTMLElement;
+  const postSlug = section?.dataset.postSlug ?? '';
+  const commentsList = document.getElementById('comments-list') as HTMLElement;
+  const form = document.getElementById('comment-form') as HTMLFormElement;
+  const status = document.getElementById('form-status') as HTMLParagraphElement;
+
+  function renderComment(c: Comment) {
+    return `
+      <div class="border border-slate-800 rounded-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-white">${escapeHtml(c.author_name)}</span>
+          <time class="text-xs text-slate-500">${new Date(c.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</time>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed">${escapeHtml(c.content)}</p>
+      </div>`;
+  }
+
+  function escapeHtml(str: string) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  async function loadComments() {
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_slug', postSlug)
+      .order('created_at', { ascending: true });
+
+    if (error || !data?.length) {
+      commentsList.innerHTML = '<p class="text-slate-500 text-sm">No comments yet. Be the first!</p>';
+      return;
+    }
+
+    commentsList.innerHTML = (data as Comment[]).map(renderComment).join('');
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = (document.getElementById('author-name') as HTMLInputElement).value.trim();
+    const content = (document.getElementById('comment-content') as HTMLTextAreaElement).value.trim();
+
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Posting...';
+
+    const { error } = await supabase
+      .from('comments')
+      .insert([{ post_slug: postSlug, author_name: name, content }]);
+
+    if (error) {
+      status.textContent = 'Failed to post comment. Please try again.';
+      status.className = 'text-sm text-red-400';
+    } else {
+      status.textContent = 'Comment posted!';
+      status.className = 'text-sm text-green-400';
+      form.reset();
+      await loadComments();
+    }
+
+    status.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = 'Post Comment';
+    setTimeout(() => status.classList.add('hidden'), 4000);
+  });
+
+  loadComments();
+</script>

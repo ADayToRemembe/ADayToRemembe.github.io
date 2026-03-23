@@ -1,0 +1,61 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate, tags, math } = post.data;
+
+const formattedDate = pubDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={`${title} — MBatu`} description={description} math={math}>
+  <article>
+    <header class="mb-10 pb-8 border-b border-slate-800">
+      <div class="flex flex-wrap gap-2 mb-4">
+        {tags.map((tag) => (
+          <a
+            href={`/blog/tag/${tag}`}
+            class="text-xs px-2.5 py-1 rounded-full bg-indigo-950 text-indigo-400 border border-indigo-800 hover:border-indigo-500 transition-colors"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">{title}</h1>
+      <p class="text-slate-400 text-lg mb-4">{description}</p>
+      <div class="flex items-center gap-3 text-sm text-slate-500">
+        <time datetime={pubDate.toISOString()}>{formattedDate}</time>
+        {updatedDate && (
+          <span>
+            · Updated{' '}
+            <time datetime={updatedDate.toISOString()}>
+              {updatedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+          </span>
+        )}
+      </div>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <div class="mt-16 pt-8 border-t border-slate-800">
+    <Comments postSlug={post.id} />
+  </div>
+</BaseLayout>

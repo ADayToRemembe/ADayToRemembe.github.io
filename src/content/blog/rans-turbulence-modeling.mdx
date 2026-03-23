@@ -1,0 +1,48 @@
+---
+title: "Introduction to RANS Turbulence Modeling in CFD"
+description: "A practical overview of Reynolds-Averaged Navier-Stokes equations and common closure models used in engineering CFD applications."
+pubDate: 2024-03-15
+tags: ["CFD", "RANS", "turbulence", "aerodynamics"]
+math: true
+---
+
+Turbulence modeling is one of the most challenging aspects of computational fluid dynamics. The **Reynolds-Averaged Navier-Stokes (RANS)** approach remains the industry standard for engineering applications due to its balance between accuracy and computational cost.
+
+## The Reynolds Decomposition
+
+Any turbulent flow variable $\phi$ can be split into a mean and fluctuating component:
+
+$$\phi = \bar{\phi} + \phi'$$
+
+Applying this decomposition to the Navier-Stokes equations and time-averaging gives us the RANS equations. For incompressible flow:
+
+$$\frac{\partial \bar{u}_i}{\partial x_i} = 0$$
+
+$$\bar{u}_j \frac{\partial \bar{u}_i}{\partial x_j} = -\frac{1}{\rho}\frac{\partial \bar{p}}{\partial x_i} + \nu \frac{\partial^2 \bar{u}_i}{\partial x_j \partial x_j} - \frac{\partial \overline{u'_i u'_j}}{\partial x_j}$$
+
+The term $-\rho \overline{u'_i u'_j}$ is the **Reynolds stress tensor** — the closure problem of turbulence modeling.
+
+## The k-ε Model
+
+The standard $k$-$\varepsilon$ model introduces two transport equations:
+
+**Turbulent kinetic energy:**
+$$\frac{\partial k}{\partial t} + \bar{u}_j \frac{\partial k}{\partial x_j} = P_k - \varepsilon + \frac{\partial}{\partial x_j}\left[\left(\nu + \frac{\nu_t}{\sigma_k}\right)\frac{\partial k}{\partial x_j}\right]$$
+
+**Dissipation rate:**
+$$\frac{\partial \varepsilon}{\partial t} + \bar{u}_j \frac{\partial \varepsilon}{\partial x_j} = C_{\varepsilon 1}\frac{\varepsilon}{k}P_k - C_{\varepsilon 2}\frac{\varepsilon^2}{k} + \frac{\partial}{\partial x_j}\left[\left(\nu + \frac{\nu_t}{\sigma_\varepsilon}\right)\frac{\partial \varepsilon}{\partial x_j}\right]$$
+
+The eddy viscosity is then computed as:
+
+$$\nu_t = C_\mu \frac{k^2}{\varepsilon}$$
+
+where the standard constants are $C_\mu = 0.09$, $C_{\varepsilon 1} = 1.44$, $C_{\varepsilon 2} = 1.92$, $\sigma_k = 1.0$, $\sigma_\varepsilon = 1.3$.
+
+## When to Use k-ε vs k-ω
+
+| Model | Best For | Weakness |
+|-------|----------|----------|
+| $k$-$\varepsilon$ | Free shear flows, far-field | Poor near-wall without wall functions |
+| $k$-$\omega$ SST | Adverse pressure gradients, separation | Sensitive to freestream $\omega$ |
+
+For most external aerodynamics problems, the **SST** (Shear Stress Transport) model offers the best compromise by blending $k$-$\omega$ near walls with $k$-$\varepsilon$ in the freestream.

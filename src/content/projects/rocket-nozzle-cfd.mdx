@@ -1,0 +1,36 @@
+---
+title: "Supersonic Rocket Nozzle CFD Analysis"
+description: "Computational analysis of a De Laval nozzle geometry using OpenFOAM with the rhoCentralFoam solver for compressible flow."
+pubDate: 2024-01-20
+tags: ["rocket", "CFD", "OpenFOAM", "compressible-flow"]
+status: "completed"
+---
+
+## Overview
+
+This project involves a full CFD analysis of a De Laval (converging-diverging) nozzle designed for a small-scale solid rocket motor. The goal was to characterize the shock structure and thrust efficiency across a range of chamber pressures.
+
+## Geometry and Mesh
+
+The nozzle geometry features:
+- Throat diameter: 12 mm
+- Exit-to-throat area ratio: $A_e/A_t = 4.2$
+- Half-angle of diverging section: 15°
+
+Meshing was performed in **snappyHexMesh** with boundary layer refinement near the wall ($y^+ < 1$).
+
+## Governing Equations
+
+The compressible RANS equations are solved in conservation form:
+
+$$\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = 0$$
+
+$$\frac{\partial (\rho \mathbf{u})}{\partial t} + \nabla \cdot (\rho \mathbf{u} \otimes \mathbf{u}) = -\nabla p + \nabla \cdot \boldsymbol{\tau}$$
+
+For the ideal gas equation of state: $p = \rho R T$
+
+## Results
+
+The simulation correctly predicts the oblique shock train at off-design conditions. At the design pressure ratio, the flow remains shock-free through the diverging section with an exit Mach number of $M_e = 2.76$.
+
+Specific impulse predicted: $I_{sp} \approx 185$ s (vacuum conditions).
