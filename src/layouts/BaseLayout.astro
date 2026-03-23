@@ -82,28 +82,83 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
         <!-- Mobile right side: language switcher + hamburger -->
         <div class="md:hidden flex items-center gap-2">
           <LanguageSwitcher currentLang={lang} />
-          <button id="menu-toggle" class="flex flex-col gap-1.5 p-2 text-slate-300 hover:text-white" aria-label="Toggle menu" aria-expanded="false">
+          <button id="menu-toggle" class="flex flex-col gap-1.5 p-2 text-slate-300 hover:text-white" aria-label="Toggle menu" aria-expanded="false" style="touch-action: manipulation;">
             <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar1"></span>
             <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar2"></span>
             <span class="block w-6 h-0.5 bg-current transition-all duration-300" id="bar3"></span>
           </button>
         </div>
       </nav>
-
-      <!-- Mobile dropdown menu -->
-      <div id="mobile-menu" class="md:hidden hidden bg-[#0a0a0f]/95 backdrop-blur-md border-b border-white/5">
-        <ul class="flex flex-col px-6 py-4 gap-4 text-sm font-medium text-slate-300">
-          {navLinks.map(link => (
-            <li><a href={link.href} class="block py-2 hover:text-white transition-colors">{link.label}</a></li>
-          ))}
-          <li>
-            <a href={`${prefix}/about`} class="gradient-button inline-block !min-w-0 !px-5 !py-2 !text-sm !rounded-full mt-1">
-              {T['nav.about']}
-            </a>
-          </li>
-        </ul>
-      </div>
     </header>
+
+    <!-- Mobile drawer overlay -->
+    <div
+      id="menu-overlay"
+      class="fixed inset-0 z-[90] bg-black/40 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"
+    ></div>
+
+    <!-- Mobile side drawer (slides in from left) -->
+    <div
+      id="mobile-menu"
+      class="fixed inset-y-0 left-0 z-[100] w-72 -translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] md:hidden"
+      style="background: linear-gradient(135deg, rgba(10,10,20,0.82) 0%, rgba(13,15,35,0.88) 100%); backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4); border-right: 1px solid rgba(255,255,255,0.07);"
+    >
+      <!-- Drawer header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/5">
+        <a href={prefix ? `${prefix}/` : '/'} class="font-bold text-xl text-white tracking-tight">
+          MBatu<span class="text-indigo-400">.</span>
+        </a>
+        <button id="menu-close" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors" aria-label="Close menu" style="touch-action: manipulation;">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Nav links -->
+      <nav class="flex flex-col px-5 py-6 gap-1 text-sm font-medium">
+        {navLinks.map(link => (
+          <a href={link.href} class="flex items-center px-3 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+            {link.label}
+          </a>
+        ))}
+        <a href={`${prefix}/about`} class="flex items-center px-3 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+          {T['nav.about']}
+        </a>
+      </nav>
+
+      <!-- Language options -->
+      <div class="px-5 pt-2 border-t border-white/5 mx-5">
+        <p class="text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-3 mt-4">Dil / Language</p>
+        <div class="flex flex-wrap gap-2">
+          {(Object.keys(languages) as import('../i18n/translations').Lang[]).map((l) => (
+            <a
+              href={(() => {
+                const cleanPath = Astro.url.pathname.replace(/^\/(tr|de|ru)(?=\/|$)/, '') || '/';
+                if (l === 'en') return cleanPath || '/';
+                return `/${l}${cleanPath === '/' ? '' : cleanPath}` || `/${l}`;
+              })()}
+              class:list={[
+                'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200',
+                l === lang
+                  ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40'
+                  : 'text-slate-400 hover:text-white hover:bg-white/8 border border-transparent',
+              ]}
+            >
+              <img
+                src={`https://flagcdn.com/w20/${languages[l].flagCode}.png`}
+                srcset={`https://flagcdn.com/w40/${languages[l].flagCode}.png 2x`}
+                width="18"
+                height="13"
+                alt={languages[l].nativeName}
+                class="rounded-sm object-cover flex-shrink-0"
+              />
+              <span>{l.toUpperCase()}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
 
     <main class:list={['flex-1', heroLayout ? '' : 'pt-20']}>
       {heroLayout ? (
@@ -126,25 +181,55 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       </div>
     </footer>
 
-    <!-- Hamburger menu toggle -->
+    <!-- Mobile drawer controls -->
     <script>
-      const toggle = document.getElementById('menu-toggle');
-      const menu = document.getElementById('mobile-menu');
+      const toggle  = document.getElementById('menu-toggle');
+      const closeBtn = document.getElementById('menu-close');
+      const menu    = document.getElementById('mobile-menu');
+      const overlay = document.getElementById('menu-overlay');
       const bar1 = document.getElementById('bar1');
       const bar2 = document.getElementById('bar2');
       const bar3 = document.getElementById('bar3');
-      toggle?.addEventListener('click', () => {
-        const open = menu?.classList.toggle('hidden') === false;
-        toggle.setAttribute('aria-expanded', String(open));
-        if (open) {
-          bar1?.classList.add('translate-y-2', 'rotate-45');
-          bar2?.classList.add('opacity-0');
-          bar3?.classList.add('-translate-y-2', '-rotate-45');
-        } else {
-          bar1?.classList.remove('translate-y-2', 'rotate-45');
-          bar2?.classList.remove('opacity-0');
-          bar3?.classList.remove('-translate-y-2', '-rotate-45');
+
+      function openDrawer() {
+        menu?.classList.remove('-translate-x-full');
+        if (overlay) {
+          overlay.classList.remove('pointer-events-none');
+          overlay.classList.remove('opacity-0');
+          overlay.classList.add('opacity-100');
         }
+        toggle?.setAttribute('aria-expanded', 'true');
+        bar1?.classList.add('translate-y-2', 'rotate-45');
+        bar2?.classList.add('opacity-0');
+        bar3?.classList.add('-translate-y-2', '-rotate-45');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeDrawer() {
+        menu?.classList.add('-translate-x-full');
+        if (overlay) {
+          overlay.classList.remove('opacity-100');
+          overlay.classList.add('opacity-0');
+          overlay.classList.add('pointer-events-none');
+        }
+        toggle?.setAttribute('aria-expanded', 'false');
+        bar1?.classList.remove('translate-y-2', 'rotate-45');
+        bar2?.classList.remove('opacity-0');
+        bar3?.classList.remove('-translate-y-2', '-rotate-45');
+        document.body.style.overflow = '';
+      }
+
+      toggle?.addEventListener('click', () => {
+        const isOpen = !menu?.classList.contains('-translate-x-full');
+        isOpen ? closeDrawer() : openDrawer();
+      });
+
+      closeBtn?.addEventListener('click', closeDrawer);
+      overlay?.addEventListener('click', closeDrawer);
+
+      // Close on Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDrawer();
       });
     </script>
 

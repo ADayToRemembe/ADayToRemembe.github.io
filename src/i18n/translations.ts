@@ -1,10 +1,10 @@
 export type Lang = 'en' | 'tr' | 'de' | 'ru';
 
-export const languages: Record<Lang, { nativeName: string; flag: string; htmlLang: string }> = {
-  en: { nativeName: 'English',  flag: '🇬🇧', htmlLang: 'en' },
-  tr: { nativeName: 'Türkçe',  flag: '🇹🇷', htmlLang: 'tr' },
-  de: { nativeName: 'Deutsch',  flag: '🇩🇪', htmlLang: 'de' },
-  ru: { nativeName: 'Русский', flag: '🇷🇺', htmlLang: 'ru' },
+export const languages: Record<Lang, { nativeName: string; flag: string; flagCode: string; htmlLang: string }> = {
+  en: { nativeName: 'English',  flag: '🇬🇧', flagCode: 'gb', htmlLang: 'en' },
+  tr: { nativeName: 'Türkçe',  flag: '🇹🇷', flagCode: 'tr', htmlLang: 'tr' },
+  de: { nativeName: 'Deutsch',  flag: '🇩🇪', flagCode: 'de', htmlLang: 'de' },
+  ru: { nativeName: 'Русский', flag: '🇷🇺', flagCode: 'ru', htmlLang: 'ru' },
 };
 
 export function getLangPrefix(lang: Lang): string {
