@@ -22,15 +22,17 @@ import LiquidHero from '../components/ui/LiquidHero.astro';
       height: 100%;
       z-index: -1;
       pointer-events: none;
+      /* Shift orange → deep night-sky blue/indigo */
+      filter: hue-rotate(215deg) saturate(1.2) brightness(0.55);
     }
     #liquid-overlay {
       position: fixed;
       inset: 0;
       background: linear-gradient(
         160deg,
-        rgba(10,10,15,0.55) 0%,
-        rgba(30,27,75,0.35) 50%,
-        rgba(10,10,15,0.70) 100%
+        rgba(5, 5, 20, 0.60) 0%,
+        rgba(15, 10, 60, 0.30) 45%,
+        rgba(5, 5, 20, 0.75) 100%
       );
       z-index: -1;
       pointer-events: none;
