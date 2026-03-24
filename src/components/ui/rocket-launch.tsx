@@ -11,8 +11,8 @@ import { useEffect, useRef, useCallback } from 'react';
 function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
 function lerp(a: number, b: number, t: number)    { return a + (b - a) * clamp(t, 0, 1); }
 
-const P1_END     = 0.45;
-const TURN_END   = 0.65;
+const P1_END     = 0.28;   // launch ends sooner → longer cruise
+const TURN_END   = 0.42;   // turn ends at 42%
 const CRUISE_DEG = 30;
 
 export default function RocketLaunch() {
@@ -42,8 +42,11 @@ export default function RocketLaunch() {
     const cruiseP = clamp((p - TURN_END) / (1 - TURN_END),     0, 1);
     const inCruise = p >= TURN_END;
 
-    const rocketTop  = inCruise ? 47 : lerp(lerp(88, 10, launchP), 47, turnP);
-    const rocketLeft = inCruise ? 20 : lerp(50, 20, turnP);
+    // During cruise: rocket drifts gently right+up so it stays dynamic over the long hold
+    const rocketTop  = inCruise ? lerp(47, 38, cruiseP * 0.6)
+                                : lerp(lerp(88, 10, launchP), 47, turnP);
+    const rocketLeft = inCruise ? lerp(20, 42, cruiseP * 0.5)
+                                : lerp(50, 20, turnP);
     const angle      = inCruise ? CRUISE_DEG : lerp(0, CRUISE_DEG, turnP);
 
     const trailH        = Math.max(0, rocketTop - 5);
@@ -107,7 +110,7 @@ export default function RocketLaunch() {
     <section
       ref={sectionRef}
       className="border-b border-white/5"
-      style={{ height: '500vh', position: 'relative' }}
+      style={{ height: '750vh', position: 'relative' }}
     >
       <div style={{
         position: 'sticky', top: 0, height: '100vh',
@@ -154,7 +157,7 @@ export default function RocketLaunch() {
           position: 'absolute', bottom: 0, left: 0, right: 0,
           height: 0, opacity: 0,
           background: 'radial-gradient(ellipse at 50% 100%,rgba(220,225,245,0.95) 0%,rgba(165,185,220,0.65) 38%,rgba(90,110,155,0.25) 68%,transparent 90%)',
-          filter: 'blur(26px)',
+          filter: 'blur(16px)',
           zIndex: 3, pointerEvents: 'none',
         }} />
 
@@ -188,7 +191,7 @@ export default function RocketLaunch() {
             transform: 'translate(-50%,0)',
             width: 110, height: 60, borderRadius: '50%',
             background: 'radial-gradient(ellipse,rgba(215,225,245,0.9) 0%,rgba(160,185,225,0.55) 50%,transparent 80%)',
-            filter: 'blur(16px)', opacity: 0, pointerEvents: 'none',
+            filter: 'blur(10px)', opacity: 0, pointerEvents: 'none', willChange: 'opacity',
           }} />
           {/* local smoke 2 */}
           <div ref={s2Ref} style={{
@@ -196,7 +199,7 @@ export default function RocketLaunch() {
             transform: 'translateX(-50%)',
             width: 160, height: 90, borderRadius: '50%',
             background: 'radial-gradient(ellipse,rgba(190,205,240,0.7) 0%,rgba(130,155,210,0.3) 55%,transparent 85%)',
-            filter: 'blur(22px)', opacity: 0, pointerEvents: 'none',
+            filter: 'blur(14px)', opacity: 0, pointerEvents: 'none', willChange: 'opacity',
           }} />
           {/* fire outer glow */}
           <div ref={f1Ref} style={{
@@ -204,7 +207,7 @@ export default function RocketLaunch() {
             transform: 'translateX(-50%)', transformOrigin: 'top center',
             width: 64, height: 0, borderRadius: '0 0 50% 50%',
             background: 'linear-gradient(to bottom,#fff176 0%,#ff6d00 18%,#d32f2f 48%,rgba(80,60,180,0.55) 78%,transparent 100%)',
-            filter: 'blur(6px)', opacity: 0, pointerEvents: 'none',
+            filter: 'blur(5px)', opacity: 0, pointerEvents: 'none', willChange: 'opacity, height',
           }} />
           {/* fire mid layer */}
           <div ref={f2Ref} style={{
@@ -212,7 +215,7 @@ export default function RocketLaunch() {
             transform: 'translateX(-50%)', transformOrigin: 'top center',
             width: 34, height: 0, borderRadius: '0 0 50% 50%',
             background: 'linear-gradient(to bottom,#ffffff 0%,#ffe57f 12%,#ff9800 40%,rgba(230,80,30,0.6) 72%,transparent 100%)',
-            filter: 'blur(3px)', opacity: 0, pointerEvents: 'none',
+            filter: 'blur(2.5px)', opacity: 0, pointerEvents: 'none', willChange: 'opacity, height',
           }} />
           {/* fire inner core */}
           <div ref={f3Ref} style={{
@@ -300,7 +303,8 @@ const cruiseStars = Array.from({ length: 30 }, (_, i) => ({
 /* ── Rocket SVG ─────────────────────────────────────────────────────── */
 function RocketSVG() {
   return (
-    <svg width="88" viewBox="0 0 154.1 259.1" xmlns="http://www.w3.org/2000/svg">
+    <svg width="88" viewBox="0 0 154.1 259.1" xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block', position: 'relative', zIndex: 1 }}>
       <style>{`
         .st0{fill:#1d4ed8;} .st1{fill:#f0f4ff;} .st5{opacity:0.55;fill:#bfdbfe;}
         .st6{opacity:0.7;fill:#1e3a8a;} .st10{fill:#eff6ff;}
