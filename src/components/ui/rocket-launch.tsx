@@ -56,12 +56,12 @@ export default function RocketLaunch() {
   const rocketLeft = inCruise ? 20 : lerp(50, 20, turnP);
   const angle      = inCruise ? CRUISE_DEG : lerp(0, CRUISE_DEG, turnP);
 
-  // ── phase-1 ground exhaust trail ─────────────────────────────────────────
+  // ── phase-1 ground exhaust trail (fully gone by end of turn) ────────────
   const trailH  = `${Math.max(0, rocketTop - 5)}vh`;   // from ground to rocket
-  const trailOp = launchP > 0.04 ? clamp(launchP * 3, 0, 1) * (1 - turnP * 0.7) : 0;
+  const trailOp = launchP > 0.04 ? clamp(launchP * 3, 0, 1) * (1 - turnP) : 0;
 
-  // ── ground smoke (phase 1 heavy, fades in cruise) ────────────────────────
-  const groundSmokeOp = clamp(launchP * 2.5, 0, 1) * lerp(1, 0.25, cruiseP);
+  // ── ground smoke (phase 1 only, fully gone by end of turn) ───────────────
+  const groundSmokeOp = clamp(launchP * 2.5, 0, 1) * (1 - turnP);
   const groundSmokeH  = lerp(0, 38, launchP);          // vh
 
   // ── cruise lower-screen smoke (fills progressively) ─────────────────────
@@ -200,17 +200,31 @@ export default function RocketLaunch() {
             pointerEvents: 'none',
           }} />
 
-          {/* Fire flame below nozzle */}
+          {/* Fire — outer glow */}
           <div style={{
             position: 'absolute',
             top: '100%', left: '50%',
             transform: 'translateX(-50%)',
             transformOrigin: 'top center',
-            width: 44,
+            width: 58,
             height: localFireLen,
             borderRadius: '0 0 50% 50%',
-            background: 'linear-gradient(to bottom,#fef08a 0%,#fb923c 22%,#ef4444 55%,rgba(99,102,241,0.4) 82%,transparent 100%)',
-            filter: 'blur(5px)',
+            background: 'linear-gradient(to bottom,rgba(255,240,160,0.95) 0%,#fb923c 20%,#ef4444 52%,rgba(99,102,241,0.45) 80%,transparent 100%)',
+            filter: 'blur(7px)',
+            opacity: localFireOp,
+            pointerEvents: 'none',
+          }} />
+          {/* Fire — bright inner core */}
+          <div style={{
+            position: 'absolute',
+            top: '100%', left: '50%',
+            transform: 'translateX(-50%)',
+            transformOrigin: 'top center',
+            width: 22,
+            height: localFireLen * 0.55,
+            borderRadius: '0 0 50% 50%',
+            background: 'linear-gradient(to bottom,#ffffff 0%,#fef9c3 18%,#fde047 50%,rgba(251,146,60,0.5) 80%,transparent 100%)',
+            filter: 'blur(2px)',
             opacity: localFireOp,
             pointerEvents: 'none',
           }} />
