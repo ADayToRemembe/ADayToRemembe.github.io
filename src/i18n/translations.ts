@@ -29,6 +29,7 @@ type TranslationKey =
   | 'about.interests.1' | 'about.interests.2' | 'about.interests.3' | 'about.interests.4'
   | 'about.tools.heading'
   | 'about.tools.1' | 'about.tools.2' | 'about.tools.3' | 'about.tools.4'
+  | 'about.subtitle'
   | 'about.contact.heading' | 'about.contact.text' | 'about.contact.or';
 
 export const ui: Record<Lang, Record<TranslationKey, string>> = {
@@ -67,6 +68,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'projects.subtitle': 'Research, simulations, and engineering projects.',
     'projects.empty': 'No projects yet. Check back soon.',
     'about.heading': 'About',
+    'about.subtitle': 'Mechanical Engineer · MSc in Heat & Fluid · CFD & Rocket Propulsion Research',
     'about.bio': "I'm a Heat & Flow Engineering researcher with a focus on computational fluid dynamics (CFD), rocket propulsion systems, and eco-friendly ventilation and HVAC design.",
     'about.interests.heading': 'Research Interests',
     'about.interests.1': 'Rocket design and propulsion systems',
@@ -118,6 +120,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'projects.subtitle': 'Araştırma, simülasyon ve mühendislik projeleri.',
     'projects.empty': 'Henüz proje yok. Yakında tekrar kontrol edin.',
     'about.heading': 'Hakkımda',
+    'about.subtitle': 'Makine Mühendisi · Isı & Akış Yüksek Lisans · CFD & Roket İtki Araştırmaları',
     'about.bio': 'Hesaplamalı akışkanlar dinamiği (CFD), roket itki sistemleri ve çevre dostu havalandırma ile HVAC tasarımı üzerine odaklanan bir Isı & Akış Mühendisliği araştırmacısıyım.',
     'about.interests.heading': 'Araştırma İlgi Alanları',
     'about.interests.1': 'Roket tasarımı ve itki sistemleri',
@@ -169,6 +172,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'projects.subtitle': 'Forschungs-, Simulations- und Ingenieurprojekte.',
     'projects.empty': 'Noch keine Projekte. Schau bald wieder vorbei.',
     'about.heading': 'Über mich',
+    'about.subtitle': 'Maschinenbauingenieur · MSc Wärme & Strömung · CFD & Raketenantriebsforschung',
     'about.bio': 'Ich bin ein Wärme- & Strömungstechnik-Forscher mit Schwerpunkt auf numerischer Strömungsmechanik (CFD), Raketenantriebssystemen und umweltfreundlichem Lüftungs- und HLK-Design.',
     'about.interests.heading': 'Forschungsinteressen',
     'about.interests.1': 'Raketendesign und Antriebssysteme',
@@ -220,6 +224,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'projects.subtitle': 'Исследовательские, симуляционные и инженерные проекты.',
     'projects.empty': 'Пока нет проектов. Загляните позже.',
     'about.heading': 'Обо мне',
+    'about.subtitle': 'Инженер-механик · Магистр тепло- и газодинамики · Исследования CFD и ракетного движения',
     'about.bio': 'Я исследователь в области тепло- и газодинамики, специализирующийся на вычислительной гидродинамике (CFD), ракетных двигательных системах и экологичных системах вентиляции и кондиционирования.',
     'about.interests.heading': 'Научные интересы',
     'about.interests.1': 'Проектирование ракет и двигательных систем',

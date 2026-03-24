@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import LiquidHero from '../../components/ui/LiquidHero.astro';
 import { type Lang, ui } from '../../i18n/translations';
 
 export function getStaticPaths() {
@@ -19,9 +20,12 @@ const T = ui[lang];
   description={T['about.bio']}
   lang={lang}
 >
-  <div class="max-w-2xl">
-    <h1 class="text-3xl font-bold text-white mb-8">{T['about.heading']}</h1>
+  <LiquidHero
+    title="Mehmet Batu AYAN"
+    subtitle={T['about.subtitle']}
+  />
 
+  <div class="max-w-2xl mt-12">
     <div class="prose">
       <p>{T['about.bio']}</p>
 
@@ -43,8 +47,10 @@ const T = ui[lang];
 
       <h2>{T['about.contact.heading']}</h2>
       <p>
-        {T['about.contact.text']} <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>{' '}
-        {T['about.contact.or']} <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>.
+        {T['about.contact.text']}{' '}
+        <a href="https://www.linkedin.com/in/batu-ayan-b63673151" target="_blank" rel="noopener">LinkedIn</a>{' '}
+        {T['about.contact.or']}{' '}
+        <a href="https://github.com/adaytoremembe" target="_blank" rel="noopener">GitHub</a>.
       </p>
     </div>
   </div>

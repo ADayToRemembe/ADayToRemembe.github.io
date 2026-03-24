@@ -1,12 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LiquidHero from '../components/ui/LiquidHero.astro';
 ---
 
 <BaseLayout
   title="About — B_AYAN"
   description="Mechanical Engineer & MSc candidate in Heat and Fluid at ITU. Specializing in CFD, liquid-fuel rocket motors, and ML-driven optimization."
 >
-  <div class="max-w-2xl space-y-12">
+  <LiquidHero
+    title="Mehmet Batu AYAN"
+    subtitle="Mechanical Engineer · MSc in Heat & Fluid · CFD & Rocket Propulsion Research"
+  />
+
+  <div class="max-w-2xl space-y-12 mt-12">
 
     <!-- ── Hero ── -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
