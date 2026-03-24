@@ -1,21 +1,11 @@
 'use client';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 /*
-  TWO-PHASE scroll-driven rocket launch — v3
-  ──────────────────────────────────────────
-  Phase 1 (0 → 0.45)  Vertical launch
-    • Rocket rises straight up
-    • Long exhaust trail from ground to rocket
-    • Heavy smoke cloud at base, building up
-    • Stars stream DOWNWARD (parallax of going up)
-
-  Phase 2 (0.45 → 1.0)  30° cruise
-    • Rocket rotates +30° (nose tilts right)
-    • Fire + smoke inside rotated wrapper → aligned at rocket's rear (30°)
-    • Stars stream at 30° angle (upper-right → lower-left)
-    • Text on right, smoke fills lower screen
-    • Locked position until page end; reverses on scroll-up
+  TWO-PHASE scroll-driven rocket launch — v4 (perf rewrite)
+  ──────────────────────────────────────────────────────────
+  Zero React re-renders during scroll.
+  All style updates go directly to DOM via refs inside a single rAF.
 */
 
 function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
@@ -23,60 +13,95 @@ function lerp(a: number, b: number, t: number)    { return a + (b - a) * clamp(t
 
 const P1_END     = 0.45;
 const TURN_END   = 0.65;
-const CRUISE_DEG = 30;   // final rocket tilt (clockwise from vertical)
+const CRUISE_DEG = 30;
 
 export default function RocketLaunch() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+  const sectionRef  = useRef<HTMLDivElement>(null);
+  const progressRef = useRef(0);
+  const frameRef    = useRef(0);
+
+  // refs to every animated DOM node
+  const bgStarsRef   = useRef<HTMLDivElement>(null);
+  const downStarsRef = useRef<HTMLDivElement>(null);
+  const trailRef     = useRef<HTMLDivElement>(null);
+  const gSmokeRef    = useRef<HTMLDivElement>(null);
+  const cStarsRef    = useRef<HTMLDivElement>(null);
+  const rocketRef    = useRef<HTMLDivElement>(null);
+  const s1Ref        = useRef<HTMLDivElement>(null);
+  const s2Ref        = useRef<HTMLDivElement>(null);
+  const f1Ref        = useRef<HTMLDivElement>(null);
+  const f2Ref        = useRef<HTMLDivElement>(null);
+  const f3Ref        = useRef<HTMLDivElement>(null);
+  const textRef      = useRef<HTMLDivElement>(null);
+  const hintRef      = useRef<HTMLDivElement>(null);
+
+  const applyFrame = useCallback(() => {
+    const p       = progressRef.current;
+    const launchP = clamp(p / P1_END,                           0, 1);
+    const turnP   = clamp((p - P1_END)  / (TURN_END - P1_END), 0, 1);
+    const cruiseP = clamp((p - TURN_END) / (1 - TURN_END),     0, 1);
+    const inCruise = p >= TURN_END;
+
+    const rocketTop  = inCruise ? 47 : lerp(lerp(88, 10, launchP), 47, turnP);
+    const rocketLeft = inCruise ? 20 : lerp(50, 20, turnP);
+    const angle      = inCruise ? CRUISE_DEG : lerp(0, CRUISE_DEG, turnP);
+
+    const trailH        = Math.max(0, rocketTop - 5);
+    const trailOp       = launchP > 0.04 ? clamp(launchP * 3, 0, 1) * (1 - turnP) : 0;
+    const groundSmokeOp = clamp(launchP * 2.5, 0, 1) * (1 - turnP);
+    const groundSmokeH  = lerp(0, 38, launchP);
+    const localFireLen  = lerp(55, 130, launchP) + cruiseP * 30;
+    const localFireOp   = launchP > 0.04 ? 1 : 0;
+    const localSmokeOp  = clamp(launchP * 3, 0, 1);
+    const downStarsOp   = clamp(launchP * 3, 0, 1) * (1 - turnP);
+    const cruiseStarsOp = turnP;
+    const textOp        = clamp((p - TURN_END - 0.05) / 0.15, 0, 1);
+
+    const s = (el: HTMLDivElement | null, styles: Partial<CSSStyleDeclaration>) => {
+      if (!el) return;
+      Object.assign(el.style, styles);
+    };
+
+    s(bgStarsRef.current,   { transform: `translateY(${launchP * -18}px)` });
+    s(downStarsRef.current, { opacity: String(downStarsOp) });
+    s(trailRef.current,     { height: `${trailH}vh`, opacity: String(trailOp) });
+    s(gSmokeRef.current,    { height: `${groundSmokeH}vh`, opacity: String(groundSmokeOp) });
+    s(cStarsRef.current,    { opacity: String(cruiseStarsOp) });
+    s(rocketRef.current,    {
+      top:       `${rocketTop}vh`,
+      left:      `${rocketLeft}%`,
+      transform: `translate(-50%,-50%) rotate(${angle}deg)`,
+    });
+    s(s1Ref.current, { opacity: String(localSmokeOp * 0.95) });
+    s(s2Ref.current, { opacity: String(localSmokeOp * 0.8) });
+    s(f1Ref.current, { height: `${localFireLen}px`,        opacity: String(localFireOp) });
+    s(f2Ref.current, { height: `${localFireLen * 0.7}px`,  opacity: String(localFireOp) });
+    s(f3Ref.current, { height: `${localFireLen * 0.42}px`, opacity: String(localFireOp) });
+    s(textRef.current, {
+      opacity:       String(textOp),
+      pointerEvents: textOp > 0 ? 'auto' : 'none',
+    });
+    s(hintRef.current, { opacity: String(p < 0.06 ? 1 - p / 0.06 : 0) });
+  }, []);
 
   const onScroll = useCallback(() => {
     const el = sectionRef.current;
     if (!el) return;
     const scrollable = el.offsetHeight - window.innerHeight;
     const scrolled   = -el.getBoundingClientRect().top;
-    setProgress(clamp(scrolled / scrollable, 0, 1));
-  }, []);
+    progressRef.current = clamp(scrolled / scrollable, 0, 1);
+    cancelAnimationFrame(frameRef.current);
+    frameRef.current = requestAnimationFrame(applyFrame);
+  }, [applyFrame]);
 
   useEffect(() => {
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(frameRef.current);
+    };
   }, [onScroll]);
-
-  // ── sub-progress ─────────────────────────────────────────────────────────
-  const launchP = clamp(progress / P1_END,                              0, 1);
-  const turnP   = clamp((progress - P1_END)  / (TURN_END - P1_END),    0, 1);
-  const cruiseP = clamp((progress - TURN_END) / (1 - TURN_END),        0, 1);
-  const inCruise = progress >= TURN_END;
-
-  // ── rocket position / rotation ───────────────────────────────────────────
-  // Phase 1: top 88vh → 10vh  (rises)
-  // Transition: 10vh → 47vh and left 50% → 20%
-  const rocketTop  = inCruise ? 47 : lerp(lerp(88, 10, launchP), 47, turnP);
-  const rocketLeft = inCruise ? 20 : lerp(50, 20, turnP);
-  const angle      = inCruise ? CRUISE_DEG : lerp(0, CRUISE_DEG, turnP);
-
-  // ── phase-1 ground exhaust trail (fully gone by end of turn) ────────────
-  const trailH  = `${Math.max(0, rocketTop - 5)}vh`;   // from ground to rocket
-  const trailOp = launchP > 0.04 ? clamp(launchP * 3, 0, 1) * (1 - turnP) : 0;
-
-  // ── ground smoke (phase 1 only, fully gone by end of turn) ───────────────
-  const groundSmokeOp = clamp(launchP * 2.5, 0, 1) * (1 - turnP);
-  const groundSmokeH  = lerp(0, 38, launchP);          // vh
-
-  // ── local fire/smoke opacity (inside wrapper) ────────────────────────────
-  const localFireLen  = lerp(55, 130, launchP) + cruiseP * 30;  // px — starts bigger
-  const localFireOp   = launchP > 0.04 ? 1 : 0;
-  const localSmokeOp  = clamp(launchP * 3, 0, 1);
-
-  // ── downward streaming stars (phase 1) ───────────────────────────────────
-  const downStarsOp   = clamp(launchP * 3, 0, 1) * (1 - turnP);
-
-  // ── angled streaming stars (phase 2) ─────────────────────────────────────
-  const cruiseStarsOp = turnP;
-
-  // ── text ──────────────────────────────────────────────────────────────────
-  const textOp = clamp((progress - TURN_END - 0.05) / 0.15, 0, 1);
 
   return (
     <section
@@ -88,19 +113,25 @@ export default function RocketLaunch() {
         position: 'sticky', top: 0, height: '100vh',
         overflow: 'hidden', background: '#0a0a0f',
       }}>
-        {/* ── ambient bg stars (subtle parallax up in phase 1) ── */}
-        <BgStars shift={launchP * -18} />
 
-        {/* ── downward streaming stars (phase 1 only) ── */}
-        <div style={{ opacity: downStarsOp, transition: 'none', pointerEvents: 'none' }}>
+        {/* ── ambient bg stars ── */}
+        <div ref={bgStarsRef} className="absolute inset-0 pointer-events-none">
+          {bgStarData.map(s => (
+            <div key={s.id} style={{
+              position: 'absolute', left: `${s.x}%`, top: `${s.y}%`,
+              width: s.sz, height: s.sz, borderRadius: '50%', background: 'white',
+              animation: `bgTwinkle ${s.dur}s ease-in-out ${s.d}s infinite`,
+            }} />
+          ))}
+        </div>
+
+        {/* ── downward streaming stars (phase 1) ── */}
+        <div ref={downStarsRef} style={{ opacity: 0, pointerEvents: 'none' }}>
           {downStars.map((s, i) => (
             <div key={i} style={{
-              position: 'absolute',
-              left:  `${s.left}%`,
-              top:   `${s.top}%`,
-              width: 1.5,
-              height: s.len,
-              background: 'linear-gradient(to bottom, transparent, rgba(200,210,255,0.85), transparent)',
+              position: 'absolute', left: `${s.left}%`, top: `${s.top}%`,
+              width: 1.5, height: s.len,
+              background: 'linear-gradient(to bottom,transparent,rgba(200,210,255,0.85),transparent)',
               borderRadius: 1,
               animation: `streamDown ${s.dur}s linear ${s.delay}s infinite`,
               zIndex: 2,
@@ -108,43 +139,36 @@ export default function RocketLaunch() {
           ))}
         </div>
 
-        {/* ── ground exhaust trail (phase 1) ── */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0, left: '50%',
+        {/* ── ground exhaust trail ── */}
+        <div ref={trailRef} style={{
+          position: 'absolute', bottom: 0, left: '50%',
           transform: 'translateX(-50%)',
-          width: 54, height: trailH,
+          width: 54, height: 0, opacity: 0,
           background: 'linear-gradient(to top,#fef08a 0%,#fb923c 18%,#ef4444 42%,rgba(99,102,241,0.45) 72%,transparent 100%)',
           filter: 'blur(7px)',
-          opacity: trailOp,
-          zIndex: 3, pointerEvents: 'none', transition: 'none',
+          zIndex: 3, pointerEvents: 'none',
         }} />
 
-        {/* ── ground smoke (phase 1, heavy) ── */}
-        <div style={{
+        {/* ── ground smoke ── */}
+        <div ref={gSmokeRef} style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
-          height: `${groundSmokeH}vh`,
+          height: 0, opacity: 0,
           background: 'radial-gradient(ellipse at 50% 100%,rgba(220,225,245,0.95) 0%,rgba(165,185,220,0.65) 38%,rgba(90,110,155,0.25) 68%,transparent 90%)',
           filter: 'blur(26px)',
-          opacity: groundSmokeOp,
-          zIndex: 3, pointerEvents: 'none', transition: 'none',
+          zIndex: 3, pointerEvents: 'none',
         }} />
 
-{/* ── angled streaming stars (phase 2, at CRUISE_DEG) ── */}
-        <div
-          style={{ opacity: cruiseStarsOp, transition: 'none', pointerEvents: 'none',
-            transform: `rotate(${CRUISE_DEG}deg)`,
-            transformOrigin: 'center center',
-          }}
-        >
+        {/* ── angled streaming stars (phase 2) ── */}
+        <div ref={cStarsRef} style={{
+          opacity: 0, pointerEvents: 'none',
+          transform: `rotate(${CRUISE_DEG}deg)`,
+          transformOrigin: 'center center',
+        }}>
           {cruiseStars.map((s, i) => (
             <div key={i} style={{
-              position: 'absolute',
-              left:  `${s.left}%`,
-              top:   `${s.top}%`,
-              width: 1.5,
-              height: s.len,
-              background: 'linear-gradient(to bottom, transparent, #818cf8, transparent)',
+              position: 'absolute', left: `${s.left}%`, top: `${s.top}%`,
+              width: 1.5, height: s.len,
+              background: 'linear-gradient(to bottom,transparent,#818cf8,transparent)',
               borderRadius: 1,
               animation: `streamDown ${s.dur}s linear ${s.delay}s infinite`,
               zIndex: 3,
@@ -152,95 +176,61 @@ export default function RocketLaunch() {
           ))}
         </div>
 
-        {/* ── ROCKET + local fire + local smoke (all rotate together) ── */}
-        <div style={{
-          position: 'absolute',
-          top:  `${rocketTop}vh`,
-          left: `${rocketLeft}%`,
-          transform: `translate(-50%, -50%) rotate(${angle}deg)`,
-          zIndex: 4, transition: 'none', willChange: 'top,left,transform',
+        {/* ── ROCKET wrapper — fire + smoke rotate with rocket ── */}
+        <div ref={rocketRef} style={{
+          position: 'absolute', top: '88vh', left: '50%',
+          transform: 'translate(-50%,-50%) rotate(0deg)',
+          zIndex: 4, willChange: 'transform',
         }}>
-          {/* Local smoke puff at nozzle — moves WITH rocket, aligned at angle */}
-          <div style={{
-            position: 'absolute',
-            top: '85%', left: '50%',
-            transform: 'translate(-50%, 0)',
-            width: 110, height: 60,
-            borderRadius: '50%',
+          {/* local smoke 1 */}
+          <div ref={s1Ref} style={{
+            position: 'absolute', top: '85%', left: '50%',
+            transform: 'translate(-50%,0)',
+            width: 110, height: 60, borderRadius: '50%',
             background: 'radial-gradient(ellipse,rgba(215,225,245,0.9) 0%,rgba(160,185,225,0.55) 50%,transparent 80%)',
-            filter: 'blur(16px)',
-            opacity: localSmokeOp * 0.95,
-            pointerEvents: 'none',
+            filter: 'blur(16px)', opacity: 0, pointerEvents: 'none',
           }} />
-
-          {/* Secondary smoke — wider, softer */}
-          <div style={{
-            position: 'absolute',
-            top: '95%', left: '50%',
+          {/* local smoke 2 */}
+          <div ref={s2Ref} style={{
+            position: 'absolute', top: '95%', left: '50%',
             transform: 'translateX(-50%)',
-            width: 160, height: 90,
-            borderRadius: '50%',
+            width: 160, height: 90, borderRadius: '50%',
             background: 'radial-gradient(ellipse,rgba(190,205,240,0.7) 0%,rgba(130,155,210,0.3) 55%,transparent 85%)',
-            filter: 'blur(22px)',
-            opacity: localSmokeOp * 0.8,
-            pointerEvents: 'none',
+            filter: 'blur(22px)', opacity: 0, pointerEvents: 'none',
           }} />
-
-          {/* Fire — outer glow */}
-          <div style={{
-            position: 'absolute',
-            top: '100%', left: '50%',
-            transform: 'translateX(-50%)',
-            transformOrigin: 'top center',
-            width: 64,
-            height: localFireLen,
-            borderRadius: '0 0 50% 50%',
+          {/* fire outer glow */}
+          <div ref={f1Ref} style={{
+            position: 'absolute', top: '100%', left: '50%',
+            transform: 'translateX(-50%)', transformOrigin: 'top center',
+            width: 64, height: 0, borderRadius: '0 0 50% 50%',
             background: 'linear-gradient(to bottom,#fff176 0%,#ff6d00 18%,#d32f2f 48%,rgba(80,60,180,0.55) 78%,transparent 100%)',
-            filter: 'blur(6px)',
-            opacity: localFireOp,
-            pointerEvents: 'none',
+            filter: 'blur(6px)', opacity: 0, pointerEvents: 'none',
           }} />
-          {/* Fire — mid layer */}
-          <div style={{
-            position: 'absolute',
-            top: '100%', left: '50%',
-            transform: 'translateX(-50%)',
-            transformOrigin: 'top center',
-            width: 34,
-            height: localFireLen * 0.7,
-            borderRadius: '0 0 50% 50%',
+          {/* fire mid layer */}
+          <div ref={f2Ref} style={{
+            position: 'absolute', top: '100%', left: '50%',
+            transform: 'translateX(-50%)', transformOrigin: 'top center',
+            width: 34, height: 0, borderRadius: '0 0 50% 50%',
             background: 'linear-gradient(to bottom,#ffffff 0%,#ffe57f 12%,#ff9800 40%,rgba(230,80,30,0.6) 72%,transparent 100%)',
-            filter: 'blur(3px)',
-            opacity: localFireOp,
-            pointerEvents: 'none',
+            filter: 'blur(3px)', opacity: 0, pointerEvents: 'none',
           }} />
-          {/* Fire — bright inner core */}
-          <div style={{
-            position: 'absolute',
-            top: '100%', left: '50%',
-            transform: 'translateX(-50%)',
-            transformOrigin: 'top center',
-            width: 16,
-            height: localFireLen * 0.42,
-            borderRadius: '0 0 50% 50%',
+          {/* fire inner core */}
+          <div ref={f3Ref} style={{
+            position: 'absolute', top: '100%', left: '50%',
+            transform: 'translateX(-50%)', transformOrigin: 'top center',
+            width: 16, height: 0, borderRadius: '0 0 50% 50%',
             background: 'linear-gradient(to bottom,#ffffff 0%,#fffde7 30%,#ffd54f 65%,transparent 100%)',
-            filter: 'blur(1.5px)',
-            opacity: localFireOp,
-            pointerEvents: 'none',
+            filter: 'blur(1.5px)', opacity: 0, pointerEvents: 'none',
           }} />
-
           <RocketSVG />
         </div>
 
-        {/* ── Text (cruise, right side) ── */}
-        <div style={{
-          position: 'absolute',
-          top: '50%', right: '5%',
+        {/* ── cruise text ── */}
+        <div ref={textRef} style={{
+          position: 'absolute', top: '50%', right: '5%',
           transform: 'translateY(-50%)',
           textAlign: 'right', maxWidth: '38vw',
-          opacity: textOp, zIndex: 5,
-          pointerEvents: textOp > 0 ? 'auto' : 'none',
-          transition: 'none',
+          opacity: 0, zIndex: 5, pointerEvents: 'none',
         }}>
           <p style={{
             fontSize: '0.62rem', fontWeight: 700, color: '#818cf8',
@@ -259,14 +249,13 @@ export default function RocketLaunch() {
           </p>
         </div>
 
-        {/* ── Scroll hint ── */}
-        <div style={{
+        {/* ── scroll hint ── */}
+        <div ref={hintRef} style={{
           position: 'absolute', bottom: '2rem', left: '50%',
           transform: 'translateX(-50%)',
           color: '#475569', fontSize: '0.62rem',
           letterSpacing: '0.18em', textTransform: 'uppercase',
-          opacity: progress < 0.06 ? 1 - progress / 0.06 : 0,
-          zIndex: 10,
+          opacity: 1, zIndex: 10,
         }}>SCROLL</div>
 
         <style>{`
@@ -274,10 +263,10 @@ export default function RocketLaunch() {
             0%,100% { opacity:0.1; } 50% { opacity:0.6; }
           }
           @keyframes streamDown {
-            0%   { transform: translateY(-20vh); opacity:0; }
+            0%   { transform:translateY(-20vh); opacity:0; }
             8%   { opacity:1; }
             92%  { opacity:1; }
-            100% { transform: translateY(120vh);  opacity:0; }
+            100% { transform:translateY(120vh); opacity:0; }
           }
         `}</style>
       </div>
@@ -285,31 +274,16 @@ export default function RocketLaunch() {
   );
 }
 
-/* ── Ambient background stars ────────────────────────────────────────── */
+/* ── Static data (module-level, never regenerated) ──────────────────── */
 const bgStarData = Array.from({ length: 65 }, (_, i) => ({
   id: i, x: Math.random() * 100, y: Math.random() * 100,
-  s: 0.5 + Math.random() * 1.8,
+  sz: 0.5 + Math.random() * 1.8,
   d: Math.random() * 5, dur: 2 + Math.random() * 3,
 }));
-function BgStars({ shift }: { shift: number }) {
-  return (
-    <div className="absolute inset-0 pointer-events-none"
-      style={{ transform: `translateY(${shift}px)`, transition: 'none' }}>
-      {bgStarData.map(s => (
-        <div key={s.id} style={{
-          position: 'absolute', left: `${s.x}%`, top: `${s.y}%`,
-          width: s.s, height: s.s, borderRadius: '50%', background: 'white',
-          animation: `bgTwinkle ${s.dur}s ease-in-out ${s.d}s infinite`,
-        }} />
-      ))}
-    </div>
-  );
-}
 
-/* ── Static star configs (avoid re-generating on each render) ────────── */
 const downStars = Array.from({ length: 35 }, (_, i) => ({
   left:  2 + (i * 11) % 96,
-  top:   (i * 17)     % 50,   // start in upper half
+  top:   (i * 17) % 50,
   len:   18 + (i % 5) * 10,
   dur:   0.55 + (i % 4) * 0.2,
   delay: -((i * 0.28) % 2.2),
@@ -323,7 +297,7 @@ const cruiseStars = Array.from({ length: 30 }, (_, i) => ({
   delay: -((i * 0.31) % 2.5),
 }));
 
-/* ── Rocket SVG — white body + dark-blue palette ─────────────────────── */
+/* ── Rocket SVG ─────────────────────────────────────────────────────── */
 function RocketSVG() {
   return (
     <svg width="88" viewBox="0 0 154.1 259.1" xmlns="http://www.w3.org/2000/svg">
