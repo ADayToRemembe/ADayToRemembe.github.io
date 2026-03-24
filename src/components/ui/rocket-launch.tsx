@@ -64,12 +64,8 @@ export default function RocketLaunch() {
   const groundSmokeOp = clamp(launchP * 2.5, 0, 1) * (1 - turnP);
   const groundSmokeH  = lerp(0, 38, launchP);          // vh
 
-  // ── cruise lower-screen smoke (fills progressively) ─────────────────────
-  const cruiseSmokeH  = lerp(0, 55, turnP + cruiseP * 0.5); // vh
-  const cruiseSmokeOp = lerp(0, 0.88, turnP);
-
   // ── local fire/smoke opacity (inside wrapper) ────────────────────────────
-  const localFireLen  = lerp(30, 90, launchP) + cruiseP * 30;  // px
+  const localFireLen  = lerp(55, 130, launchP) + cruiseP * 30;  // px — starts bigger
   const localFireOp   = launchP > 0.04 ? 1 : 0;
   const localSmokeOp  = clamp(launchP * 3, 0, 1);
 
@@ -86,7 +82,7 @@ export default function RocketLaunch() {
     <section
       ref={sectionRef}
       className="border-b border-white/5"
-      style={{ height: '290vh', position: 'relative' }}
+      style={{ height: '500vh', position: 'relative' }}
     >
       <div style={{
         position: 'sticky', top: 0, height: '100vh',
@@ -134,17 +130,7 @@ export default function RocketLaunch() {
           zIndex: 3, pointerEvents: 'none', transition: 'none',
         }} />
 
-        {/* ── cruise lower smoke (phase 2) ── */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          height: `${cruiseSmokeH}vh`,
-          background: 'radial-gradient(ellipse at 40% 100%,rgba(180,195,230,0.85) 0%,rgba(120,145,200,0.45) 50%,transparent 85%)',
-          filter: 'blur(30px)',
-          opacity: cruiseSmokeOp,
-          zIndex: 3, pointerEvents: 'none', transition: 'none',
-        }} />
-
-        {/* ── angled streaming stars (phase 2, at CRUISE_DEG) ── */}
+{/* ── angled streaming stars (phase 2, at CRUISE_DEG) ── */}
         <div
           style={{ opacity: cruiseStarsOp, transition: 'none', pointerEvents: 'none',
             transform: `rotate(${CRUISE_DEG}deg)`,
@@ -206,11 +192,25 @@ export default function RocketLaunch() {
             top: '100%', left: '50%',
             transform: 'translateX(-50%)',
             transformOrigin: 'top center',
-            width: 58,
+            width: 64,
             height: localFireLen,
             borderRadius: '0 0 50% 50%',
-            background: 'linear-gradient(to bottom,rgba(255,240,160,0.95) 0%,#fb923c 20%,#ef4444 52%,rgba(99,102,241,0.45) 80%,transparent 100%)',
-            filter: 'blur(7px)',
+            background: 'linear-gradient(to bottom,#fff176 0%,#ff6d00 18%,#d32f2f 48%,rgba(80,60,180,0.55) 78%,transparent 100%)',
+            filter: 'blur(6px)',
+            opacity: localFireOp,
+            pointerEvents: 'none',
+          }} />
+          {/* Fire — mid layer */}
+          <div style={{
+            position: 'absolute',
+            top: '100%', left: '50%',
+            transform: 'translateX(-50%)',
+            transformOrigin: 'top center',
+            width: 34,
+            height: localFireLen * 0.7,
+            borderRadius: '0 0 50% 50%',
+            background: 'linear-gradient(to bottom,#ffffff 0%,#ffe57f 12%,#ff9800 40%,rgba(230,80,30,0.6) 72%,transparent 100%)',
+            filter: 'blur(3px)',
             opacity: localFireOp,
             pointerEvents: 'none',
           }} />
@@ -220,11 +220,11 @@ export default function RocketLaunch() {
             top: '100%', left: '50%',
             transform: 'translateX(-50%)',
             transformOrigin: 'top center',
-            width: 22,
-            height: localFireLen * 0.55,
+            width: 16,
+            height: localFireLen * 0.42,
             borderRadius: '0 0 50% 50%',
-            background: 'linear-gradient(to bottom,#ffffff 0%,#fef9c3 18%,#fde047 50%,rgba(251,146,60,0.5) 80%,transparent 100%)',
-            filter: 'blur(2px)',
+            background: 'linear-gradient(to bottom,#ffffff 0%,#fffde7 30%,#ffd54f 65%,transparent 100%)',
+            filter: 'blur(1.5px)',
             opacity: localFireOp,
             pointerEvents: 'none',
           }} />
