@@ -21,7 +21,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="flex flex-wrap gap-2 text-xs text-slate-400">
           <span>📍 Istanbul, Maltepe</span>
           <span>✉️ <a href="mailto:mehmetbatuayan@gmail.com" class="hover:text-white transition-colors">mehmetbatuayan@gmail.com</a></span>
-          <span>🔗 <a href="https://www.linkedin.com/in/batu-ayan-b63673151/" target="_blank" rel="noopener" class="hover:text-white transition-colors">LinkedIn</a></span>
+          <span>🔗 <a href="https://www.linkedin.com/in/batu-ayan-b63673151?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener" class="hover:text-white transition-colors">LinkedIn</a></span>
         </div>
       </div>
     </div>
@@ -31,7 +31,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">About</h2>
       <p class="text-slate-400 leading-relaxed">
         After graduating from Izmir Katip Celebi University in Mechanical Engineering, I completed my coursework
-        at Istanbul Technical University for an MSc in Heat & Fluid and am currently in the thesis stage.
+        at Istanbul Technical University for an MSc in Heat & Fluid and am currently in the thesis stage
+        as a contributor at <a href="https://astralteam.itu.edu.tr/contributors.html" target="_blank" rel="noopener" class="text-indigo-400 hover:text-indigo-300 transition-colors">ASTRAL</a>.
         My academic foundation covers CFD, FEM, and jet engine design. My current research focuses on the
         parametric design of liquid-fuel rocket motors and ML-assisted optimization processes.
         My core goal is to combine computational sciences with fluid dynamics in advanced engineering projects.
@@ -57,13 +58,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             gpa: '2.71 / 4.0',
             note: '',
           },
-          {
-            school: 'Hatice Güzelcan Anadolu Lisesi',
-            degree: 'High School',
-            period: '2011 – 2015',
-            gpa: '',
-            note: '',
-          },
         ].map(e => (
           <div class="flex gap-4">
             <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></div>
@@ -86,37 +80,34 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="space-y-6">
         {[
           {
-            company: 'BOSS Mekanik A.Ş.',
-            role: 'Mechanical Chief / Project Engineer',
+            role: 'Site Chief / Project Engineer',
             period: 'Jul 2024 – Mar 2025',
             items: [
-              'Plumbing, fire suppression, waterproofing and HVAC installation',
-              'Planning, organization and project management',
-              'Delivery of a 13-floor hospital hotel for cancer patients',
+              'Led site operations for a 12-floor hospital hotel project as construction site chief',
+              'Managed plumbing, fire suppression, waterproofing and HVAC installation',
+              'Oversaw full project delivery from planning through handover',
+              'Coordinated multi-discipline teams and scheduling',
             ],
           },
           {
-            company: 'TURAY AYDINLATMA A.Ş.',
             role: 'Design Engineer',
             period: 'Oct – Dec 2022',
             items: [
               'Visual design and product development',
-              'Full assembly phase planning',
-              'Bill of materials creation',
+              'Performed reverse engineering studies on existing assemblies',
+              'Full assembly phase planning and bill of materials creation',
             ],
           },
           {
-            company: 'BRT MAKİNA A.Ş.',
-            role: 'Internship',
+            role: 'Mechanical Engineering Intern',
             period: 'May – Jun 2022',
             items: [
-              'Order process management (communication, returns)',
-              'Technical drawing and assembly (gear design)',
+              'Technical drawing and gear assembly studies',
+              'Order process and supply chain management',
             ],
           },
           {
-            company: 'DOĞU İKLİMLENDİRME A.Ş.',
-            role: 'Internship',
+            role: 'HVAC Engineering Intern',
             period: 'Aug – Sep 2020',
             items: [
               'Production planning and delivery scheduling',
@@ -128,10 +119,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500/60 flex-shrink-0"></div>
             <div class="flex-1">
               <div class="flex flex-wrap items-baseline gap-2 mb-1">
-                <span class="font-medium text-white">{exp.company}</span>
+                <span class="font-medium text-white">{exp.role}</span>
                 <span class="text-xs text-slate-500">{exp.period}</span>
               </div>
-              <p class="text-sm text-indigo-400 mb-2">{exp.role}</p>
               <ul class="text-sm text-slate-400 space-y-0.5 list-disc list-inside">
                 {exp.items.map(item => <li>{item}</li>)}
               </ul>
@@ -163,27 +153,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </div>
     </section>
 
-    <!-- ── Languages & Certs ── -->
+    <!-- ── Languages ── -->
     <section>
-      <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-white/10">Languages & Certifications</h2>
-      <div class="grid sm:grid-cols-2 gap-6">
-        <div>
-          <p class="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">Languages</p>
-          <ul class="text-sm text-slate-400 space-y-1">
-            <li>🇹🇷 Turkish — Native</li>
-            <li>🇬🇧 English — Professional (C1)</li>
-          </ul>
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">Licenses & Certs</p>
-          <ul class="text-sm text-slate-400 space-y-1">
-            <li>🚁 UAV / Drone License (TR-İHA-A-2462009137158)</li>
-            <li>⚓ Amateur Sailor Certificate</li>
-            <li>📻 Short Range Radio Operator Certificate</li>
-            <li>🚗 Driver's License B1/B</li>
-            <li>📊 Management & Financial Accounting (Coursera)</li>
-          </ul>
-        </div>
+      <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">Languages</h2>
+      <div class="flex flex-wrap gap-3">
+        <span class="text-sm text-slate-400">🇹🇷 Turkish — Native</span>
+        <span class="text-sm text-slate-400">🇬🇧 English — Professional (C1)</span>
       </div>
     </section>
 
@@ -200,7 +175,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <section>
       <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">Hobbies & Interests</h2>
       <div class="flex flex-wrap gap-2">
-        {['Swimming', 'Basketball', 'Electric Guitar', 'Chess (UKD: 1095)', 'Python Game Dev'].map(h => (
+        {[
+          'Swimming',
+          'Basketball',
+          'Electric Guitar',
+          'Chess — active tournament player; achieved notable results at the İzmir Beko Tournament representing his university',
+          'Python Game Development',
+        ].map(h => (
           <span class="text-sm px-3 py-1.5 bg-slate-900/60 border border-white/10 text-slate-300 rounded-full">{h}</span>
         ))}
       </div>
@@ -211,8 +192,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">Contact</h2>
       <div class="flex flex-wrap gap-4 text-sm text-slate-400">
         <a href="mailto:mehmetbatuayan@gmail.com" class="hover:text-white transition-colors">✉️ mehmetbatuayan@gmail.com</a>
-        <a href="https://www.linkedin.com/in/batu-ayan-b63673151/" target="_blank" rel="noopener" class="hover:text-white transition-colors">🔗 LinkedIn</a>
-        <span>📞 +90 544 407 0297</span>
+        <a href="https://www.linkedin.com/in/batu-ayan-b63673151?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener" class="hover:text-white transition-colors">🔗 LinkedIn</a>
       </div>
     </section>
 
