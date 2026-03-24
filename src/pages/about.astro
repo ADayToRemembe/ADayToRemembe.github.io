@@ -25,99 +25,28 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </div>
     </div>
 
-    <!-- ── Bio ── -->
-    <section class="prose prose-invert prose-slate max-w-none">
+    <!-- ── Single flowing bio ── -->
+    <section class="prose prose-invert prose-slate max-w-none text-slate-400 leading-relaxed space-y-4">
       <p>
         Mehmet Batu, Izmir Katip Celebi University'den Makine Mühendisliği mezuniyetinin ardından
         Istanbul Technical University'de Isı ve Akış alanında yüksek lisansını tamamladı; tez döneminde
-        <a href="https://astralteam.itu.edu.tr/contributors.html" target="_blank" rel="noopener">ASTRAL</a>
+        <a href="https://astralteam.itu.edu.tr/contributors.html" target="_blank" rel="noopener" class="text-indigo-400 hover:text-indigo-300 no-underline">ASTRAL</a>
         bünyesinde sıvı yakıtlı roket motorlarının parametrik tasarım algoritması üzerinde çalışmaktadır.
         Hesaplamalı Akışkanlar Dinamiği, Sonlu Elemanlar Yöntemi, gaz türbinleri ve jet motor tasarımı
-        üzerine ileri düzey dersler alan Batu, akademik altyapısını doğrudan mühendislik problemlerine
-        uygulamayı hedefler. IAC 2026 roket projesinde takım lideri olarak görev yapmaktadır.
+        üzerine ileri düzey dersler aldı; IAC 2026 roket projesinde takım lideri olarak görev yapmaktadır.
       </p>
-    </section>
-
-    <!-- ── Education ── -->
-    <section>
-      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">Eğitim</h2>
-      <div class="space-y-5">
-        <div class="flex gap-4">
-          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></div>
-          <div>
-            <p class="font-medium text-white">Istanbul Technical University <span class="text-xs text-indigo-400 font-mono ml-2">3.0 / 4.0</span></p>
-            <p class="text-sm text-slate-400">MSc — Heat and Fluid Mechanics · 2023–devam · Tez aşaması</p>
-          </div>
-        </div>
-        <div class="flex gap-4">
-          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500/60 flex-shrink-0"></div>
-          <div>
-            <p class="font-medium text-white">Izmir Katip Celebi University <span class="text-xs text-indigo-400 font-mono ml-2">2.71 / 4.0</span></p>
-            <p class="text-sm text-slate-400">BSc — Mechanical Engineering</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ── Experience ── -->
-    <section>
-      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">Deneyim</h2>
-      <div class="space-y-8 text-sm text-slate-400 leading-relaxed">
-
-        <div class="flex gap-4">
-          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></div>
-          <div>
-            <div class="flex flex-wrap items-baseline gap-2 mb-1">
-              <span class="font-medium text-white">Şantiye Şefi / Proje Mühendisi</span>
-              <span class="text-xs text-slate-500">Tem 2024 – Mar 2025</span>
-            </div>
-            <p>
-              Kanser hastaları için inşa edilen 13 katlı hastane otelinin şantiye şefliğini üstlendi.
-              Sıhhi tesisat, yangın söndürme, yalıtım ve havalandırma sistemlerinin kurulumunu
-              koordine ederek projeyi planlama aşamasından teslime taşıdı. Çok disiplinli ekipleri
-              yönetti, takvim ve kalite kontrolünden sorumlu oldu.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500/60 flex-shrink-0"></div>
-          <div>
-            <div class="flex flex-wrap items-baseline gap-2 mb-1">
-              <span class="font-medium text-white">Tasarım Mühendisi</span>
-              <span class="text-xs text-slate-500">Eki – Ara 2022</span>
-            </div>
-            <p>
-              Görsel tasarım ve ürün geliştirme çalışmaları yürüttü; mevcut montajlar üzerinde
-              tersine mühendislik analizleri gerçekleştirdi. Montaj fazlarını planlayarak malzeme
-              listelerini oluşturdu.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-600 flex-shrink-0"></div>
-          <div>
-            <div class="flex flex-wrap items-baseline gap-2 mb-1">
-              <span class="font-medium text-white">Stajyer — Makine</span>
-              <span class="text-xs text-slate-500">May – Haz 2022</span>
-            </div>
-            <p>Teknik çizim ve dişli montaj çalışmaları; sipariş süreci yönetimi.</p>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-600 flex-shrink-0"></div>
-          <div>
-            <div class="flex flex-wrap items-baseline gap-2 mb-1">
-              <span class="font-medium text-white">Stajyer — HVAC</span>
-              <span class="text-xs text-slate-500">Ağu – Eyl 2020</span>
-            </div>
-            <p>Üretim planlaması ve 5S uygulaması; ısı geri kazanım ünitesi üretim bandında düzenleme çalışmaları.</p>
-          </div>
-        </div>
-
-      </div>
+      <p>
+        Akademik kariyerinin yanında sektörde de aktif rol üstlendi. Kanser hastaları için inşa edilen
+        13 katlı bir hastane otelinde şantiye şefliği yaptı: sıhhi tesisat, yangın söndürme, yalıtım ve
+        havalandırma sistemlerini koordine ederek projeyi teslim etti. Daha önce bir aydınlatma firmasında
+        tasarım mühendisi olarak görsel tasarım ve tersine mühendislik çalışmaları yürüttü;
+        iki ayrı stajda dişli tasarımı ve HVAC üretim süreçlerini deneyimledi.
+      </p>
+      <p>
+        Yüzme ve basketbol ile aktif spor hayatını sürdüren Batu, elektro gitar çalar.
+        Uzun yıllar boyunca satranç turnuvalarına katıldı; İzmir Beko Turnuvası'nda okulunu
+        temsil ederek başarılı sonuçlar elde etti. Python ile oyun geliştirme de ilgi alanları arasında.
+      </p>
     </section>
 
     <!-- ── Projects ── -->

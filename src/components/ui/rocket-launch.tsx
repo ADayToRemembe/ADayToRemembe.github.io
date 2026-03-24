@@ -1,146 +1,191 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 
+/*
+  Faithful port of the CodePen rocket animation.
+  Original colors ($green:#18F4A3 / $bg:#01191d) replaced with site palette:
+    - border/glow   → #6366f1  (indigo-500)
+    - inner glow    → rgba(99,102,241,0.3)
+    - star/sparkle  → #c7d2fe  (indigo-200)
+    - bg            → #0a0a0f
+*/
+
+type Phase = 'idle' | 'ignite' | 'launch' | 'gone';
+
 export default function RocketLaunch() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<'idle' | 'ignite' | 'liftoff' | 'gone'>('idle');
+  const [phase, setPhase] = useState<Phase>('idle');
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && phase === 'idle') {
-          // Sequence: idle → ignite (0s) → liftoff (1.8s) → gone (3.2s)
-          setPhase('ignite');
-          setTimeout(() => setPhase('liftoff'), 1800);
-          setTimeout(() => setPhase('gone'), 3200);
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && phase === 'idle') {
+          // delay 0.5s before starting so user sees initial state
+          setTimeout(() => setPhase('ignite'),   500);
+          setTimeout(() => setPhase('launch'),  2600);
+          setTimeout(() => setPhase('gone'),    4000);
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.35 }
     );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
+    obs.observe(el);
+    return () => obs.disconnect();
   }, [phase]);
 
-  const gone = phase === 'gone';
-  const liftoff = phase === 'liftoff' || gone;
-  const ignite = phase === 'ignite' || liftoff || gone;
+  const ignite = phase !== 'idle';
+  const launch  = phase === 'launch' || phase === 'gone';
+  const gone    = phase === 'gone';
 
   return (
     <section
       ref={sectionRef}
-      className="relative py-32 px-6 border-b border-white/5 overflow-hidden"
-      style={{ background: '#0a0a0f' }}
+      className="relative py-20 px-6 border-b border-white/5 overflow-hidden"
+      style={{ background: '#0a0a0f', minHeight: '560px' }}
     >
-      {/* Stars bg layer */}
-      <StarField active={ignite} />
+      {/* Ambient bg stars */}
+      <BgStars />
 
-      <div className="relative z-10 flex flex-col items-center gap-16">
+      <div className="relative z-10 flex flex-col items-center gap-14">
 
-        {/* ── Artboard ── */}
+        {/* ──────────── ARTBOARD ──────────── */}
         <div
-          className="artboard-wrap"
           style={{
-            transition: gone ? 'transform 0.5s ease-in-out' : 'none',
-            transform: gone ? 'rotate(40deg)' : 'rotate(0deg)',
+            transition: gone ? 'transform 0.4s ease-in-out' : 'none',
+            transform:  gone ? 'rotate(40deg)' : 'rotate(0deg)',
           }}
         >
-          <div className="artboard">
-
-            {/* Static stars (fade out on liftoff) */}
-            <div className="stars" style={{ opacity: liftoff ? 0 : 1, transition: 'opacity 0.3s ease' }}>
-              {[
-                { top: '22%', left: '18%' },
-                { top: '55%', left: '72%' },
-                { top: '35%', left: '60%' },
-              ].map((pos, i) => (
-                <div key={i} className="star" style={{ position: 'absolute', ...pos }} />
-              ))}
+          <div
+            className="artboard"
+            style={{
+              position: 'relative',
+              width: 300,
+              height: 300,
+              borderRadius: '50%',
+              border: '2px solid #6366f1',
+              overflow: 'hidden',
+              // Safari border-radius + overflow fix
+              WebkitMaskImage: 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC)',
+              backfaceVisibility: 'hidden',
+              background: 'radial-gradient(circle at bottom, rgba(99,102,241,0.28) 0%, rgba(10,10,15,0) 60%)',
+              boxShadow: '0 0 40px rgba(99,102,241,0.12), inset 0 0 30px rgba(99,102,241,0.06)',
+            }}
+          >
+            {/* Static stars — fade on launch */}
+            <div style={{
+              opacity: launch ? 0 : 1,
+              transition: 'opacity 0.3s ease',
+            }}>
+              <Spark top="37%" left="31%" delay="0s" />
+              <Spark top="22%" left="65%" delay="0.4s" />
+              <Spark top="60%" left="55%" delay="0.8s" />
             </div>
 
-            {/* Shooting stars (appear on liftoff) */}
-            <div className="stars2" style={{ opacity: liftoff ? 1 : 0, transition: 'opacity 0.3s ease' }}>
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="shootingstar"
-                  style={{
-                    '--delay': `${i * 0.18}s`,
-                    '--angle': `${30 + i * 12}deg`,
-                    '--len': `${30 + Math.random() * 40}px`,
-                    top: `${Math.random() * 90}%`,
-                    left: `${Math.random() * 90}%`,
-                  } as React.CSSProperties}
-                />
+            {/* Shooting stars — appear on launch */}
+            <div style={{
+              opacity: launch ? 1 : 0,
+              transition: 'opacity 0.3s ease',
+            }}>
+              {Array.from({ length: 20 }).map((_, i) => (
+                <ShootingStar key={i} i={i} />
               ))}
             </div>
 
             {/* Smoke */}
-            {ignite && (
-              <div
-                className="smoke"
-                style={{
-                  transform: liftoff ? 'translateY(-20px) scale(2.5)' : 'translateY(0) scale(1)',
-                  opacity: gone ? 0 : 1,
-                  transition: liftoff
-                    ? 'transform 2s ease-out, opacity 1.5s ease 1s'
-                    : 'none',
-                }}
-              />
-            )}
-
-            {/* Rocket */}
             <div
-              id="rocket"
-              className={ignite && !liftoff ? 'shake' : ''}
               style={{
-                transform: liftoff
+                position: 'absolute',
+                width: 130,
+                height: 70,
+                borderRadius: '50%',
+                left: '50%',
+                bottom: 30,
+                transform: launch
+                  ? 'translateX(-50%) translateY(-20px) scale(2.2)'
+                  : 'translateX(-50%) translateY(0) scale(1)',
+                opacity: ignite ? (gone ? 0 : 0.85) : 0,
+                background: 'radial-gradient(ellipse, rgba(148,163,184,0.4) 0%, rgba(100,116,139,0.15) 55%, transparent 80%)',
+                filter: 'blur(8px)',
+                transition: launch
+                  ? 'transform 2.5s ease-out, opacity 1.8s ease 0.8s'
+                  : 'opacity 0.5s ease',
+                zIndex: 1,
+              }}
+            />
+
+            {/* Takeoff flame — CodePen: from scaleY:0 y:-200 → position */}
+            <div
+              style={{
+                position: 'absolute',
+                width: 26,
+                height: 52,
+                left: '50%',
+                /* Rocket bottom is at top:100+80=180px, flame sits just below */
+                top: 182,
+                transformOrigin: 'top center',
+                borderRadius: '0 0 60% 60%',
+                background: 'radial-gradient(ellipse at 50% 0%, #fef08a 0%, #f97316 38%, #dc2626 72%, transparent 100%)',
+                filter: 'blur(2px)',
+                zIndex: 2,
+                /* Start hidden (scaleY:0, pushed up), appear on ignite, fly on launch */
+                transform: ignite
+                  ? launch
+                    ? 'translateX(-50%) translateY(-300px) scaleY(1)'
+                    : 'translateX(-50%) translateY(0) scaleY(1)'
+                  : 'translateX(-50%) translateY(-200px) scaleY(0)',
+                opacity: gone ? 0 : 1,
+                transition: ignite
+                  ? launch
+                    ? 'transform 1.4s cubic-bezier(0.2,0,0.05,1), opacity 0.3s ease'
+                    : 'transform 0.5s cubic-bezier(0.16,1,0.3,1)'
+                  : 'none',
+                animation: ignite && !launch ? 'flamePulse 0.13s ease-in-out infinite' : 'none',
+              }}
+            />
+
+            {/* Rocket — top:100px left:50% (matches CodePen) */}
+            <div
+              style={{
+                position: 'absolute',
+                width: 80,
+                left: '50%',
+                top: 100,
+                marginLeft: -40,
+                zIndex: 3,
+                transform: launch
                   ? gone
-                    ? 'translateX(-50%) translateY(-340px) rotate(40deg)'
-                    : 'translateX(-50%) translateY(-320px)'
-                  : 'translateX(-50%) translateY(0)',
-                transition: liftoff
+                    ? 'translateY(-300px) rotate(40deg)'
+                    : 'translateY(-300px)'
+                  : 'translateY(0)',
+                transition: launch
                   ? gone
                     ? 'transform 1.2s cubic-bezier(0.4,0,0.2,1)'
                     : 'transform 1.4s cubic-bezier(0.2,0,0.05,1)'
                   : 'none',
+                animation: ignite && !launch ? 'rocketShake 0.12s ease-in-out infinite' : 'none',
               }}
             >
               <RocketSVG />
             </div>
 
-            {/* Takeoff flames */}
-            <div
-              className="takeoff"
-              style={{
-                transform: ignite
-                  ? liftoff
-                    ? 'translateX(-50%) translateY(-320px) scaleY(1)'
-                    : 'translateX(-50%) translateY(0) scaleY(1)'
-                  : 'translateX(-50%) translateY(-200px) scaleY(0)',
-                opacity: gone ? 0 : 1,
-                transition: ignite
-                  ? liftoff
-                    ? 'transform 1.4s cubic-bezier(0.2,0,0.05,1), opacity 0.4s ease'
-                    : 'transform 0.5s cubic-bezier(0.16,1,0.3,1)'
-                  : 'none',
-              }}
-            />
           </div>
         </div>
 
-        {/* ── Text (visible after liftoff, overlaid) ── */}
+        {/* ──────────── TEXT (appears after liftoff) ──────────── */}
         <div
           className="text-center max-w-2xl"
           style={{
             opacity: gone ? 1 : 0,
-            transform: gone ? 'translateY(0)' : 'translateY(24px)',
-            transition: 'opacity 0.9s ease 0.3s, transform 0.9s ease 0.3s',
+            transform: gone ? 'translateY(0)' : 'translateY(28px)',
+            transition: 'opacity 0.9s ease 0.4s, transform 0.9s ease 0.4s',
           }}
         >
           <p className="text-xs font-semibold text-indigo-400 tracking-widest uppercase mb-4">
             Engineering in Motion
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-5 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-5 leading-tight"
+            style={{ textShadow: '0 2px 20px rgba(99,102,241,0.3)' }}>
             Pushing the boundaries<br />of engineering.
           </h2>
           <p className="text-slate-400 text-lg leading-relaxed">
@@ -151,177 +196,124 @@ export default function RocketLaunch() {
       </div>
 
       <style>{`
-        .artboard-wrap {
-          width: 300px;
-          height: 300px;
-          flex-shrink: 0;
-        }
-        .artboard {
-          position: relative;
-          width: 300px;
-          height: 300px;
-          border-radius: 50%;
-          border: 2px solid #6366f1;
-          overflow: hidden;
-          -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
-          background: radial-gradient(circle at bottom, rgba(99,102,241,0.25) 0%, rgba(10,10,15,0) 65%);
-          box-shadow: 0 0 40px rgba(99,102,241,0.15), inset 0 0 30px rgba(99,102,241,0.08);
-        }
-
-        /* Rocket */
-        #rocket {
-          position: absolute;
-          width: 56px;
-          left: 50%;
-          bottom: 60px;
-          z-index: 3;
-        }
-        #rocket.shake {
-          animation: rocketShake 0.12s ease-in-out infinite;
-        }
         @keyframes rocketShake {
-          0%,100% { transform: translateX(-50%) translateX(0); }
-          25%      { transform: translateX(-50%) translateX(2px); }
-          75%      { transform: translateX(-50%) translateX(-2px); }
-        }
-
-        /* Takeoff flame */
-        .takeoff {
-          position: absolute;
-          width: 28px;
-          height: 50px;
-          left: 50%;
-          bottom: 44px;
-          z-index: 2;
-          border-radius: 0 0 60% 60%;
-          background: radial-gradient(ellipse at 50% 0%, #fef08a 0%, #f97316 40%, #dc2626 80%, transparent 100%);
-          filter: blur(2px);
-          transform-origin: top center;
-          animation: flamePulse 0.12s ease-in-out infinite;
+          0%,100% { transform: translateY(0) translateX(0); }
+          25%      { transform: translateY(0) translateX(2px); }
+          75%      { transform: translateY(0) translateX(-2px); }
         }
         @keyframes flamePulse {
-          0%,100% { transform: translateX(-50%) scaleY(1) scaleX(1); }
-          33%      { transform: translateX(-50%) scaleY(1.3) scaleX(0.8); }
-          66%      { transform: translateX(-50%) scaleY(0.85) scaleX(1.2); }
+          0%,100% { transform: translateX(-50%) scaleY(1)   scaleX(1);   }
+          33%      { transform: translateX(-50%) scaleY(1.35) scaleX(0.8); }
+          66%      { transform: translateX(-50%) scaleY(0.8)  scaleX(1.2); }
         }
-
-        /* Smoke */
-        .smoke {
-          position: absolute;
-          width: 120px;
-          height: 60px;
-          left: 50%;
-          transform: translateX(-50%);
-          bottom: 30px;
-          z-index: 1;
-          border-radius: 50%;
-          background: radial-gradient(ellipse, rgba(148,163,184,0.45) 0%, rgba(100,116,139,0.2) 50%, transparent 80%);
-          filter: blur(6px);
-        }
-
-        /* Star sparkle */
-        .star {
-          width: 10px;
-          height: 10px;
-        }
-        .star::before, .star::after {
-          content: '';
-          position: absolute;
-          width: 2px;
-          height: 10px;
-          background: #e0e7ff;
-          border-radius: 50%;
-          box-shadow: 0 0 6px 3px rgba(199,210,254,0.2);
-          animation: sparkle 1.2s ease-in-out infinite alternate;
-        }
-        .star::after  { transform: translate(-50%,-50%) rotate(90deg); }
-        .star::before { transform: translate(-50%,-50%); }
         @keyframes sparkle {
-          from { opacity: 0.4; transform: translate(-50%,-50%) scale(0.8); }
-          to   { opacity: 1;   transform: translate(-50%,-50%) scale(1.2); }
+          from { opacity: 0.3; transform: translate(-50%,-50%) scale(0.8); }
+          to   { opacity: 1;   transform: translate(-50%,-50%) scale(1.3); }
         }
-
-        /* Shooting stars */
-        .shootingstar {
-          position: absolute;
-          width: var(--len, 36px);
-          height: 1.5px;
-          background: linear-gradient(90deg, #c7d2fe, transparent);
-          border-radius: 1px;
-          transform: rotate(var(--angle, 45deg));
-          animation: shoot 0.6s ease-out var(--delay, 0s) infinite;
+        @keyframes sparkle90 {
+          from { opacity: 0.3; transform: translate(-50%,-50%) rotate(90deg) scale(0.8); }
+          to   { opacity: 1;   transform: translate(-50%,-50%) rotate(90deg) scale(1.3); }
         }
         @keyframes shoot {
-          0%   { opacity: 0; transform: rotate(var(--angle,45deg)) translateX(0); }
-          20%  { opacity: 1; }
-          100% { opacity: 0; transform: rotate(var(--angle,45deg)) translateX(60px); }
+          0%   { opacity: 0;   transform: rotate(var(--a)) translateX(0); }
+          15%  { opacity: 1; }
+          100% { opacity: 0;   transform: rotate(var(--a)) translateX(70px); }
+        }
+        @keyframes bgTwinkle {
+          0%,100% { opacity: 0.15; }
+          50%      { opacity: 0.7; }
         }
       `}</style>
     </section>
   );
 }
 
+/* ── Sparkle star (cross shape, matches CodePen .star::before/after) ── */
+function Spark({ top, left, delay }: { top: string; left: string; delay: string }) {
+  return (
+    <div style={{ position: 'absolute', top, left, width: 10, height: 10 }}>
+      <span style={{
+        position: 'absolute', width: 3, height: 10,
+        background: '#c7d2fe', borderRadius: '50%',
+        boxShadow: '0 0 6px 3px rgba(199,210,254,0.15)',
+        animation: `sparkle 1s ease-in-out ${delay} infinite alternate`,
+        transform: 'translate(-50%,-50%)',
+      }} />
+      <span style={{
+        position: 'absolute', width: 3, height: 10,
+        background: '#c7d2fe', borderRadius: '50%',
+        boxShadow: '0 0 6px 3px rgba(199,210,254,0.15)',
+        animation: `sparkle90 1s ease-in-out ${delay} infinite alternate`,
+        transform: 'translate(-50%,-50%) rotate(90deg)',
+      }} />
+    </div>
+  );
+}
+
+/* ── Shooting star ── */
+function ShootingStar({ i }: { i: number }) {
+  const angle = 20 + i * 17;
+  const len   = 28 + (i % 4) * 12;
+  return (
+    <div style={{
+      position: 'absolute',
+      top:  `${5 + (i * 13) % 85}%`,
+      left: `${5 + (i * 19) % 85}%`,
+      width: len,
+      height: 1.5,
+      background: 'linear-gradient(90deg, #818cf8, transparent)',
+      borderRadius: 1,
+      '--a': `${angle}deg`,
+      animation: `shoot ${0.5 + (i % 3) * 0.2}s ease-out ${(i * 0.14).toFixed(2)}s infinite`,
+    } as React.CSSProperties} />
+  );
+}
+
+/* ── Rocket SVG — shape identical to CodePen, indigo palette ── */
 function RocketSVG() {
   return (
-    <svg width="56" height="140" viewBox="0 0 56 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Nose */}
-      <path d="M28 5 C20 22 16 44 14 58 L42 58 C40 44 36 22 28 5Z" fill="#e2e8f0"/>
+    <svg width="80" height="160" viewBox="0 0 80 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Nose cone */}
+      <path d="M40 6 C30 26 24 50 22 68 L58 68 C56 50 50 26 40 6Z" fill="#e0e7ff"/>
       {/* Body */}
-      <rect x="14" y="58" width="28" height="55" rx="3" fill="#cbd5e1"/>
-      {/* Window */}
-      <circle cx="28" cy="78" r="7" fill="#1e293b"/>
-      <circle cx="28" cy="78" r="5" fill="#6366f1" opacity="0.7"/>
-      <circle cx="26" cy="76" r="2" fill="white" opacity="0.5"/>
-      {/* Engine */}
-      <path d="M14 113 L10 124 L46 124 L42 113Z" fill="#94a3b8"/>
-      {/* Fins */}
-      <path d="M14 86 L3 113 L14 109Z" fill="#6366f1"/>
-      <path d="M42 86 L53 113 L42 109Z" fill="#6366f1"/>
+      <rect x="22" y="68" width="36" height="62" rx="3" fill="#c7d2fe"/>
       {/* Stripe */}
-      <rect x="14" y="90" width="28" height="7" fill="#818cf8" opacity="0.5"/>
+      <rect x="22" y="100" width="36" height="10" fill="#818cf8" opacity="0.6"/>
+      {/* Window */}
+      <circle cx="40" cy="86" r="9" fill="#1e1b4b"/>
+      <circle cx="40" cy="86" r="7" fill="#6366f1" opacity="0.8"/>
+      <circle cx="37" cy="83" r="2.5" fill="white" opacity="0.5"/>
+      {/* Engine */}
+      <path d="M22 130 L17 144 L63 144 L58 130Z" fill="#a5b4fc"/>
       {/* Nozzle */}
-      <ellipse cx="28" cy="124" rx="11" ry="4" fill="#475569"/>
+      <ellipse cx="40" cy="144" rx="14" ry="5" fill="#6366f1"/>
+      {/* Left fin */}
+      <path d="M22 98 L6 130 L22 126Z" fill="#6366f1"/>
+      {/* Right fin */}
+      <path d="M58 98 L74 130 L58 126Z" fill="#6366f1"/>
     </svg>
   );
 }
 
-function StarField({ active }: { active: boolean }) {
+/* ── Background ambient stars ── */
+function BgStars() {
   const stars = useRef(
-    Array.from({ length: 50 }, (_, i) => ({
+    Array.from({ length: 55 }, (_, i) => ({
       id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: 0.5 + Math.random() * 1.5,
-      delay: Math.random() * 4,
-      dur: 2 + Math.random() * 3,
+      x: Math.random() * 100, y: Math.random() * 100,
+      s: 0.5 + Math.random() * 1.5,
+      d: Math.random() * 4, dur: 2 + Math.random() * 3,
     }))
   ).current;
-
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+    <div className="absolute inset-0 pointer-events-none">
       {stars.map(s => (
-        <div
-          key={s.id}
-          style={{
-            position: 'absolute',
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: s.size,
-            height: s.size,
-            borderRadius: '50%',
-            background: 'white',
-            opacity: active ? undefined : 0.1,
-            animation: active ? `twinkle ${s.dur}s ease-in-out ${s.delay}s infinite` : 'none',
-            transition: 'opacity 1s ease',
-          }}
-        />
+        <div key={s.id} style={{
+          position: 'absolute', left: `${s.x}%`, top: `${s.y}%`,
+          width: s.s, height: s.s, borderRadius: '50%', background: 'white',
+          animation: `bgTwinkle ${s.dur}s ease-in-out ${s.d}s infinite`,
+        }} />
       ))}
-      <style>{`
-        @keyframes twinkle {
-          0%,100% { opacity:0.2; }
-          50%      { opacity:0.9; }
-        }
-      `}</style>
     </div>
   );
 }
