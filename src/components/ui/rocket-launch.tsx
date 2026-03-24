@@ -2,222 +2,226 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 /*
-  Scroll-driven full-screen rocket launch.
-  - Section is 260vh tall; a sticky 100vh viewport pins while the user scrolls.
-  - scroll progress 0→1 drives every animation value directly, so scrolling
-    back up fully reverses the animation.
-  - Rocket moves from bottom → top as progress increases.
-  - Exhaust trail grows upward from the bottom of the page.
-  - Smoke cloud billows at the base.
-  - Text fades in at ~65% progress.
+  TWO-PHASE scroll-driven full-screen rocket launch
+  ─────────────────────────────────────────────────
+  Phase 1 (0 → 0.45)  Vertical launch
+    • Rocket rises from bottom to top
+    • Exhaust trail grows from ground up
+    • Smoke cloud builds and fills screen from bottom
+
+  Phase 2 (0.45 → 1.0)  Horizontal cruise
+    • Rocket rotates −90° and settles at center-left
+    • Horizontal fire trail extends to the left
+    • Stars stream from right to left (parallel to flight)
+    • Text fades in on the right side
+    • Everything freezes in place — scroll only changes density/opacity
+    • Reversible on scroll-up
 */
 
+function clamp(v: number, lo: number, hi: number) {
+  return Math.max(lo, Math.min(hi, v));
+}
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * clamp(t, 0, 1);
+}
+
+// Breakpoints
+const P1_END   = 0.45; // vertical launch done
+const TURN_END = 0.65; // rotation / reposition done
+// cruise   = TURN_END → 1.0
+
 export default function RocketLaunch() {
-  const sectionRef  = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0); // 0 – 1
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
 
   const onScroll = useCallback(() => {
     const el = sectionRef.current;
     if (!el) return;
-    const rect        = el.getBoundingClientRect();
-    const scrollable  = el.offsetHeight - window.innerHeight; // total scrollable px
-    const scrolled    = -rect.top;                            // how far scrolled in
-    setProgress(Math.max(0, Math.min(1, scrolled / scrollable)));
+    const scrollable = el.offsetHeight - window.innerHeight;
+    const scrolled   = -el.getBoundingClientRect().top;
+    setProgress(clamp(scrolled / scrollable, 0, 1));
   }, []);
 
   useEffect(() => {
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // set initial value
+    onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, [onScroll]);
 
-  // ── derived values ──────────────────────────────────────────────────────────
-  const launched     = progress > 0.05;
-  const showText     = progress > 0.65;
+  // ── Sub-progress per phase ───────────────────────────────────────────────
+  const launchP = clamp(progress / P1_END, 0, 1);
+  const turnP   = clamp((progress - P1_END)  / (TURN_END - P1_END), 0, 1);
+  const cruiseP = clamp((progress - TURN_END) / (1 - TURN_END),     0, 1);
 
-  // Rocket: starts at 15% from bottom, rises to 85% from bottom (70vh travel)
-  const rocketBottom = 15 + progress * 70;          // % of viewport height
-  const rocketOpacity= progress < 0.95 ? 1 : Math.max(0, 1 - (progress - 0.95) / 0.05);
+  const inCruise = progress >= TURN_END;
 
-  // Exhaust trail: grows from 0 to rocketBottom%
-  const trailHeight  = launched ? `${rocketBottom}vh` : '0px';
-  const trailOpacity = launched ? Math.min(progress * 4, 1) : 0;
+  // ── Rocket transform ─────────────────────────────────────────────────────
+  // Phase 1: top goes from 88vh → 10vh (rocket rises)
+  // Transition: top 10% → 47%; left 50% → 15%; rotation 0 → -90deg
+  // Cruise: locked at top 47%, left 15%, rotation -90deg
+  const rocketTop  = inCruise ? 47 : lerp(lerp(88, 10, launchP), 47, turnP);
+  const rocketLeft = inCruise ? 15 : lerp(50, 15, turnP);
+  const rotation   = inCruise ? -90 : lerp(0, -90, turnP);
 
-  // Smoke width broadens as launch progresses
-  const smokeWidth   = 20 + progress * 60;          // 20vw → 80vw
-  const smokeOpacity = launched ? Math.min(progress * 3, 0.95) : 0;
+  // ── Vertical exhaust (phase 1) ───────────────────────────────────────────
+  const v_trailH   = `${lerp(0, rocketTop, launchP)}vh`;
+  const v_trailOp  = launchP > 0.05 ? clamp(launchP * 3, 0, 1) : 0;
 
-  // Stars parallax (move slightly opposite to rocket)
-  const starShift    = progress * -15;              // px upward
+  // ── Smoke (builds through phase 1, fills screen in cruise) ───────────────
+  const smokeBase  = clamp(launchP * 1.4, 0, 1);           // dense by launch end
+  const smokeFull  = lerp(smokeBase, 1, turnP + cruiseP * 0.6); // fills screen in phase 2
+  const smokeH     = lerp(20, 65, smokeFull);               // vh of smoke height
 
-  // Text
-  const textOpacity  = showText ? Math.min((progress - 0.65) / 0.15, 1) : 0;
+  // ── Horizontal exhaust (cruise) ──────────────────────────────────────────
+  const h_trailW   = inCruise ? `${lerp(0, 35, clamp(turnP * 2, 0, 1))}vw` : '0';
+  const h_trailOp  = turnP;
+
+  // ── Streaming stars (cruise) ─────────────────────────────────────────────
+  const starsOp    = turnP;
+
+  // ── Text ─────────────────────────────────────────────────────────────────
+  const textOp     = clamp((progress - TURN_END - 0.05) / 0.15, 0, 1);
 
   return (
     <section
       ref={sectionRef}
       className="border-b border-white/5"
-      style={{ height: '260vh', position: 'relative' }}
+      style={{ height: '290vh', position: 'relative' }}
     >
-      {/* ── sticky viewport ── */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          overflow: 'hidden',
-          background: '#0a0a0f',
-        }}
-      >
-        {/* Ambient background stars */}
-        <BgStars shift={starShift} />
+      {/* ── sticky viewport ──────────────────────────────────────────── */}
+      <div style={{
+        position: 'sticky', top: 0, height: '100vh',
+        overflow: 'hidden', background: '#0a0a0f',
+      }}>
+        {/* Background stars — parallax in cruise */}
+        <BgStars shift={launchP * -20} />
 
-        {/* ── Exhaust / fire trail ── */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 52,
-            height: trailHeight,
-            background:
-              'linear-gradient(to top, #fef08a 0%, #fb923c 18%, #ef4444 42%, rgba(99,102,241,0.45) 72%, transparent 100%)',
-            filter: 'blur(6px)',
-            opacity: trailOpacity,
-            zIndex: 2,
-            transition: 'opacity 0.2s ease',
-          }}
-        />
+        {/* ── Vertical exhaust trail (phase 1) ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0, left: '50%',
+          transform: 'translateX(-50%)',
+          width: 56, height: v_trailH,
+          background: 'linear-gradient(to top,#fef08a 0%,#fb923c 18%,#ef4444 42%,rgba(99,102,241,0.45) 72%,transparent 100%)',
+          filter: 'blur(7px)',
+          opacity: v_trailOp,
+          zIndex: 2,
+          transition: 'none',
+          pointerEvents: 'none',
+        }} />
 
-        {/* ── Smoke cloud at page base ── */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width:  `${smokeWidth}vw`,
-            height: '22vh',
-            background:
-              'radial-gradient(ellipse at 50% 100%, rgba(210,220,240,0.85) 0%, rgba(160,180,210,0.5) 45%, transparent 80%)',
-            filter: 'blur(22px)',
-            opacity: smokeOpacity,
-            zIndex: 3,
-            transition: 'none',
-          }}
-        />
+        {/* ── Smoke — bottom-up fill ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0, left: 0, right: 0,
+          height: `${smokeH}vh`,
+          background: 'radial-gradient(ellipse at 50% 100%, rgba(210,220,240,0.9) 0%, rgba(150,175,215,0.55) 40%, rgba(80,100,140,0.2) 70%, transparent 90%)',
+          filter: 'blur(24px)',
+          opacity: smokeFull * 0.92,
+          zIndex: 3,
+          pointerEvents: 'none',
+          transition: 'none',
+        }} />
 
-        {/* ── Secondary smoke puffs ── */}
-        {[
-          { left: '30%', delay: 0.1, scale: 0.7 },
-          { left: '70%', delay: 0.2, scale: 0.6 },
-          { left: '20%', delay: 0.3, scale: 0.5 },
-          { left: '80%', delay: 0.4, scale: 0.55 },
-        ].map((p, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              bottom: `${4 + i * 2}vh`,
-              left: p.left,
-              transform: `translateX(-50%) scale(${1 + progress * p.scale})`,
-              width: '14vw',
-              height: '10vh',
-              background:
-                'radial-gradient(ellipse, rgba(200,215,235,0.6) 0%, transparent 70%)',
-              filter: 'blur(14px)',
-              opacity: smokeOpacity * (0.6 + i * 0.1),
-              zIndex: 3,
-              transition: 'none',
-            }}
-          />
-        ))}
+        {/* ── Horizontal exhaust trail (cruise) ── */}
+        <div style={{
+          position: 'absolute',
+          top: `${rocketTop}vh`,
+          left: 0,
+          width: h_trailW,
+          height: 48,
+          transform: 'translateY(-50%)',
+          background: 'linear-gradient(to right, transparent 0%, rgba(99,102,241,0.4) 30%, #ef4444 65%, #fb923c 82%, #fef08a 100%)',
+          filter: 'blur(6px)',
+          opacity: h_trailOp,
+          zIndex: 2,
+          pointerEvents: 'none',
+          transition: 'none',
+        }} />
 
         {/* ── Rocket ── */}
-        <div
-          style={{
-            position: 'absolute',
-            left: '50%',
-            bottom: `${rocketBottom}vh`,
-            transform: 'translateX(-50%)',
-            opacity: rocketOpacity,
-            zIndex: 4,
-            willChange: 'bottom',
-          }}
-        >
+        <div style={{
+          position: 'absolute',
+          top:  `${rocketTop}vh`,
+          left: `${rocketLeft}%`,
+          transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+          zIndex: 4,
+          willChange: 'top,left,transform',
+          transition: 'none',
+        }}>
           <RocketSVG />
         </div>
 
-        {/* ── Text overlay (appears at ~65% scroll) ── */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
-            zIndex: 5,
-            opacity: textOpacity,
-            pointerEvents: textOpacity > 0 ? 'auto' : 'none',
-            padding: '0 1.5rem',
-            width: '100%',
-            maxWidth: '640px',
-          }}
-        >
-          <p
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              color: '#818cf8',
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              marginBottom: '1rem',
-            }}
-          >
+        {/* ── Streaming stars (cruise) ── */}
+        <div style={{ opacity: starsOp, transition: 'none', pointerEvents: 'none' }}>
+          {streamingStars.map((s, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                top:  `${s.top}%`,
+                left: `${s.left}%`,
+                width: s.len,
+                height: 1.5,
+                background: 'linear-gradient(to left, #818cf8, transparent)',
+                borderRadius: 1,
+                zIndex: 3,
+                animation: `streamLeft ${s.dur}s linear ${s.delay}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* ── Text (cruise, right half) ── */}
+        <div style={{
+          position: 'absolute',
+          top: '50%', right: '6%',
+          transform: 'translateY(-50%)',
+          textAlign: 'right',
+          maxWidth: '38vw',
+          opacity: textOp,
+          zIndex: 5,
+          pointerEvents: textOp > 0 ? 'auto' : 'none',
+          transition: 'none',
+        }}>
+          <p style={{
+            fontSize: '0.65rem', fontWeight: 700, color: '#818cf8',
+            letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: '0.9rem',
+          }}>
             Engineering in Motion
           </p>
-          <h2
-            style={{
-              fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-              fontWeight: 700,
-              color: '#ffffff',
-              lineHeight: 1.15,
-              marginBottom: '1.25rem',
-              textShadow: '0 2px 24px rgba(99,102,241,0.4)',
-            }}
-          >
+          <h2 style={{
+            fontSize: 'clamp(1.6rem, 3.5vw, 3rem)', fontWeight: 700,
+            color: '#fff', lineHeight: 1.15, marginBottom: '1rem',
+            textShadow: '0 2px 24px rgba(99,102,241,0.5)',
+          }}>
             Pushing the boundaries<br />of engineering.
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.65 }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: 1.65 }}>
             Research in CFD, turbulence modelling, and eco-friendly HVAC —
             grounded in the governing equations of fluid mechanics.
           </p>
         </div>
 
-        {/* ── Scroll hint (visible at start) ── */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '2rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            color: '#475569',
-            fontSize: '0.65rem',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            opacity: progress < 0.08 ? 1 - progress / 0.08 : 0,
-            transition: 'opacity 0.3s ease',
-            zIndex: 10,
-          }}
-        >
-          SCROLL
-        </div>
+        {/* ── Scroll hint ── */}
+        <div style={{
+          position: 'absolute', bottom: '2rem', left: '50%',
+          transform: 'translateX(-50%)',
+          color: '#475569', fontSize: '0.62rem',
+          letterSpacing: '0.18em', textTransform: 'uppercase',
+          opacity: progress < 0.06 ? 1 - progress / 0.06 : 0,
+          zIndex: 10,
+        }}>SCROLL</div>
 
         <style>{`
           @keyframes bgTwinkle {
-            0%,100% { opacity: 0.12; }
-            50%      { opacity: 0.65; }
+            0%,100% { opacity:0.1; } 50% { opacity:0.6; }
+          }
+          @keyframes streamLeft {
+            0%   { transform: translateX(0vw);    opacity: 0; }
+            8%   { opacity: 1; }
+            92%  { opacity: 1; }
+            100% { transform: translateX(-120vw); opacity: 0; }
           }
         `}</style>
       </div>
@@ -225,55 +229,46 @@ export default function RocketLaunch() {
   );
 }
 
-/* ── Background stars with optional parallax shift ── */
-function BgStars({ shift }: { shift: number }) {
-  const stars = useRef(
-    Array.from({ length: 70 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      s: 0.5 + Math.random() * 1.8,
-      d: Math.random() * 4,
-      dur: 2 + Math.random() * 3,
-    }))
-  ).current;
+/* ── Background ambient stars ─────────────────────────────────────────── */
+const bgStarData = Array.from({ length: 65 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100, y: Math.random() * 100,
+  s: 0.5 + Math.random() * 1.8,
+  d: Math.random() * 5, dur: 2 + Math.random() * 3,
+}));
 
+function BgStars({ shift }: { shift: number }) {
   return (
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{ transform: `translateY(${shift}px)`, transition: 'none' }}
-    >
-      {stars.map(s => (
-        <div
-          key={s.id}
-          style={{
-            position: 'absolute',
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            width: s.s,
-            height: s.s,
-            borderRadius: '50%',
-            background: 'white',
-            animation: `bgTwinkle ${s.dur}s ease-in-out ${s.d}s infinite`,
-          }}
-        />
+    <div className="absolute inset-0 pointer-events-none"
+      style={{ transform: `translateY(${shift}px)`, transition: 'none' }}>
+      {bgStarData.map(s => (
+        <div key={s.id} style={{
+          position: 'absolute', left: `${s.x}%`, top: `${s.y}%`,
+          width: s.s, height: s.s, borderRadius: '50%', background: 'white',
+          animation: `bgTwinkle ${s.dur}s ease-in-out ${s.d}s infinite`,
+        }} />
       ))}
     </div>
   );
 }
 
-/* ── Original CodePen rocket SVG — white body + dark-blue palette ── */
+/* ── Pre-generated streaming star config (stable across renders) ─────── */
+const streamingStars = Array.from({ length: 30 }, (_, i) => ({
+  top:   5 + (i * 13) % 90,
+  left:  60 + (i * 7)  % 40,    // start on right side
+  len:   20 + (i % 5) * 12,
+  dur:   0.6 + (i % 4) * 0.25,
+  delay: -((i * 0.31) % 2.5),
+}));
+
+/* ── Rocket SVG — original CodePen shape, white + dark-blue palette ──── */
 function RocketSVG() {
   return (
     <svg width="90" viewBox="0 0 154.1 259.1" xmlns="http://www.w3.org/2000/svg">
       <style>{`
-        .st0{fill:#1d4ed8;}
-        .st1{fill:#f0f4ff;}
-        .st5{opacity:0.55;fill:#bfdbfe;}
-        .st6{opacity:0.7;fill:#1e3a8a;}
-        .st10{fill:#eff6ff;}
-        .st11{fill:#1e3a8a;}
-        .st12{fill:#3b82f6;}
+        .st0{fill:#1d4ed8;} .st1{fill:#f0f4ff;} .st5{opacity:0.55;fill:#bfdbfe;}
+        .st6{opacity:0.7;fill:#1e3a8a;} .st10{fill:#eff6ff;}
+        .st11{fill:#1e3a8a;} .st12{fill:#3b82f6;}
       `}</style>
       <path className="st0" d="M97.4 236.1c0 2.6-5.2 4.7-11.7 4.7H70.3c-6.4 0-11.7-2.1-11.7-4.7v-4.5c0-2.6 5.2-4.7 11.7-4.7h15.4c6.4 0 11.7 2.1 11.7 4.7v4.5zM37.1 137.4s-28 19.2-28 32v59.3l30-30-2-61.3zM117.5 137.4s28 19.2 28 32v59.3l-30-30 2-61.3z"/>
       <path className="st1" d="M29.6 140.5c.3 36.4 8.3 69.6 21.3 95.3 8.6-2.8 17.7-4.4 27.2-4.4 9.5-.1 18.6 1.3 27.3 4 12.5-25.9 19.9-59.3 19.6-95.6-.6-57.8-20.4-107.7-48.8-132-28.1 24.8-47.1 75-46.6 132.7z"/>
