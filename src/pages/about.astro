@@ -6,7 +6,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   title="About — B_AYAN"
   description="Mechanical Engineer & MSc candidate in Heat and Fluid at ITU. Specializing in CFD, liquid-fuel rocket motors, and ML-driven optimization."
 >
-  <div class="max-w-3xl space-y-14">
+  <div class="max-w-2xl space-y-12">
 
     <!-- ── Hero ── -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
@@ -17,183 +17,170 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       />
       <div>
         <h1 class="text-3xl font-bold text-white mb-1">Mehmet Batu AYAN</h1>
-        <p class="text-indigo-400 font-medium mb-2">Mechanical Engineer · MSc (Heat & Fluid) — Thesis Stage</p>
-        <div class="flex flex-wrap gap-2 text-xs text-slate-400">
-          <span>📍 Istanbul, Maltepe</span>
-          <span>✉️ <a href="mailto:mehmetbatuayan@gmail.com" class="hover:text-white transition-colors">mehmetbatuayan@gmail.com</a></span>
-          <span>🔗 <a href="https://www.linkedin.com/in/batu-ayan-b63673151?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener" class="hover:text-white transition-colors">LinkedIn</a></span>
+        <p class="text-indigo-400 font-medium mb-2">Mechanical Engineer · MSc (Heat & Fluid)</p>
+        <div class="flex flex-wrap gap-3 text-xs text-slate-400">
+          <a href="mailto:mehmetbatuayan@gmail.com" class="hover:text-white transition-colors">✉️ mehmetbatuayan@gmail.com</a>
+          <a href="https://www.linkedin.com/in/batu-ayan-b63673151?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener" class="hover:text-white transition-colors">🔗 LinkedIn</a>
         </div>
       </div>
     </div>
 
-    <!-- ── About ── -->
-    <section>
-      <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">About</h2>
-      <p class="text-slate-400 leading-relaxed">
-        After graduating from Izmir Katip Celebi University in Mechanical Engineering, I completed my coursework
-        at Istanbul Technical University for an MSc in Heat & Fluid and am currently in the thesis stage
-        as a contributor at <a href="https://astralteam.itu.edu.tr/contributors.html" target="_blank" rel="noopener" class="text-indigo-400 hover:text-indigo-300 transition-colors">ASTRAL</a>.
-        My academic foundation covers CFD, FEM, and jet engine design. My current research focuses on the
-        parametric design of liquid-fuel rocket motors and ML-assisted optimization processes.
-        My core goal is to combine computational sciences with fluid dynamics in advanced engineering projects.
+    <!-- ── Bio ── -->
+    <section class="prose prose-invert prose-slate max-w-none">
+      <p>
+        Mehmet Batu, Izmir Katip Celebi University'den Makine Mühendisliği mezuniyetinin ardından
+        Istanbul Technical University'de Isı ve Akış alanında yüksek lisansını tamamladı; tez döneminde
+        <a href="https://astralteam.itu.edu.tr/contributors.html" target="_blank" rel="noopener">ASTRAL</a>
+        bünyesinde sıvı yakıtlı roket motorlarının parametrik tasarım algoritması üzerinde çalışmaktadır.
+        Hesaplamalı Akışkanlar Dinamiği, Sonlu Elemanlar Yöntemi, gaz türbinleri ve jet motor tasarımı
+        üzerine ileri düzey dersler alan Batu, akademik altyapısını doğrudan mühendislik problemlerine
+        uygulamayı hedefler. IAC 2026 roket projesinde takım lideri olarak görev yapmaktadır.
       </p>
     </section>
 
     <!-- ── Education ── -->
     <section>
-      <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-white/10">Education</h2>
-      <div class="space-y-4">
-        {[
-          {
-            school: 'Istanbul Technical University',
-            degree: 'MSc — Heat and Fluid Mechanics',
-            period: '2023 – present',
-            gpa: '3.0 / 4.0',
-            note: 'Thesis stage',
-          },
-          {
-            school: 'Izmir Katip Celebi University',
-            degree: 'BSc — Mechanical Engineering',
-            period: '–2023',
-            gpa: '2.71 / 4.0',
-            note: '',
-          },
-        ].map(e => (
-          <div class="flex gap-4">
-            <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></div>
-            <div>
-              <div class="flex flex-wrap items-baseline gap-2">
-                <span class="font-medium text-white">{e.school}</span>
-                {e.gpa && <span class="text-xs text-indigo-400 font-mono">{e.gpa}</span>}
-                <span class="text-xs text-slate-500">{e.period}</span>
-              </div>
-              <p class="text-sm text-slate-400">{e.degree}{e.note ? ` · ${e.note}` : ''}</p>
-            </div>
+      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">Eğitim</h2>
+      <div class="space-y-5">
+        <div class="flex gap-4">
+          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-white">Istanbul Technical University <span class="text-xs text-indigo-400 font-mono ml-2">3.0 / 4.0</span></p>
+            <p class="text-sm text-slate-400">MSc — Heat and Fluid Mechanics · 2023–devam · Tez aşaması</p>
           </div>
-        ))}
+        </div>
+        <div class="flex gap-4">
+          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500/60 flex-shrink-0"></div>
+          <div>
+            <p class="font-medium text-white">Izmir Katip Celebi University <span class="text-xs text-indigo-400 font-mono ml-2">2.71 / 4.0</span></p>
+            <p class="text-sm text-slate-400">BSc — Mechanical Engineering</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- ── Experience ── -->
     <section>
-      <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-white/10">Work Experience</h2>
-      <div class="space-y-6">
-        {[
-          {
-            role: 'Site Chief / Project Engineer',
-            period: 'Jul 2024 – Mar 2025',
-            items: [
-              'Led site operations for a 12-floor hospital hotel project as construction site chief',
-              'Managed plumbing, fire suppression, waterproofing and HVAC installation',
-              'Oversaw full project delivery from planning through handover',
-              'Coordinated multi-discipline teams and scheduling',
-            ],
-          },
-          {
-            role: 'Design Engineer',
-            period: 'Oct – Dec 2022',
-            items: [
-              'Visual design and product development',
-              'Performed reverse engineering studies on existing assemblies',
-              'Full assembly phase planning and bill of materials creation',
-            ],
-          },
-          {
-            role: 'Mechanical Engineering Intern',
-            period: 'May – Jun 2022',
-            items: [
-              'Technical drawing and gear assembly studies',
-              'Order process and supply chain management',
-            ],
-          },
-          {
-            role: 'HVAC Engineering Intern',
-            period: 'Aug – Sep 2020',
-            items: [
-              'Production planning and delivery scheduling',
-              '5S application in warehouse and heat recovery unit production line',
-            ],
-          },
-        ].map(exp => (
-          <div class="flex gap-4">
-            <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500/60 flex-shrink-0"></div>
-            <div class="flex-1">
-              <div class="flex flex-wrap items-baseline gap-2 mb-1">
-                <span class="font-medium text-white">{exp.role}</span>
-                <span class="text-xs text-slate-500">{exp.period}</span>
-              </div>
-              <ul class="text-sm text-slate-400 space-y-0.5 list-disc list-inside">
-                {exp.items.map(item => <li>{item}</li>)}
-              </ul>
+      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">Deneyim</h2>
+      <div class="space-y-8 text-sm text-slate-400 leading-relaxed">
+
+        <div class="flex gap-4">
+          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></div>
+          <div>
+            <div class="flex flex-wrap items-baseline gap-2 mb-1">
+              <span class="font-medium text-white">Şantiye Şefi / Proje Mühendisi</span>
+              <span class="text-xs text-slate-500">Tem 2024 – Mar 2025</span>
             </div>
+            <p>
+              Kanser hastaları için inşa edilen 13 katlı hastane otelinin şantiye şefliğini üstlendi.
+              Sıhhi tesisat, yangın söndürme, yalıtım ve havalandırma sistemlerinin kurulumunu
+              koordine ederek projeyi planlama aşamasından teslime taşıdı. Çok disiplinli ekipleri
+              yönetti, takvim ve kalite kontrolünden sorumlu oldu.
+            </p>
           </div>
-        ))}
+        </div>
+
+        <div class="flex gap-4">
+          <div class="mt-1.5 w-2 h-2 rounded-full bg-indigo-500/60 flex-shrink-0"></div>
+          <div>
+            <div class="flex flex-wrap items-baseline gap-2 mb-1">
+              <span class="font-medium text-white">Tasarım Mühendisi</span>
+              <span class="text-xs text-slate-500">Eki – Ara 2022</span>
+            </div>
+            <p>
+              Görsel tasarım ve ürün geliştirme çalışmaları yürüttü; mevcut montajlar üzerinde
+              tersine mühendislik analizleri gerçekleştirdi. Montaj fazlarını planlayarak malzeme
+              listelerini oluşturdu.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-600 flex-shrink-0"></div>
+          <div>
+            <div class="flex flex-wrap items-baseline gap-2 mb-1">
+              <span class="font-medium text-white">Stajyer — Makine</span>
+              <span class="text-xs text-slate-500">May – Haz 2022</span>
+            </div>
+            <p>Teknik çizim ve dişli montaj çalışmaları; sipariş süreci yönetimi.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4">
+          <div class="mt-1.5 w-2 h-2 rounded-full bg-slate-600 flex-shrink-0"></div>
+          <div>
+            <div class="flex flex-wrap items-baseline gap-2 mb-1">
+              <span class="font-medium text-white">Stajyer — HVAC</span>
+              <span class="text-xs text-slate-500">Ağu – Eyl 2020</span>
+            </div>
+            <p>Üretim planlaması ve 5S uygulaması; ısı geri kazanım ünitesi üretim bandında düzenleme çalışmaları.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── Projects ── -->
+    <section>
+      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">Projeler</h2>
+      <div class="space-y-3 text-sm text-slate-400">
+        <div class="flex gap-3">
+          <span class="text-indigo-400 flex-shrink-0">→</span>
+          <span><span class="text-white font-medium">IAC 2026 Roket Projesi</span> — Takım lideri olarak uluslararası astronotik kongre kapsamında roket sistemi geliştiriyor.</span>
+        </div>
+        <div class="flex gap-3">
+          <span class="text-indigo-400 flex-shrink-0">→</span>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_matlab-code-and-graph-activity-6942095121848877056-o8MS" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Gauss-Seidel Iteration</span> — MATLAB ile analitik ve iteratif ısı transferi çözümü.</a>
+        </div>
+        <div class="flex gap-3">
+          <span class="text-indigo-400 flex-shrink-0">→</span>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_cfd-activity-6935890485097938944-rxOo" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Transient Heat Transfer</span> — Katı cisim için zamanla değişen ısı transferi simülasyonu (CFD).</a>
+        </div>
+        <div class="flex gap-3">
+          <span class="text-indigo-400 flex-shrink-0">→</span>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_r-29-re-drawing-work-activity-6935888211512557568-kqfZ" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">R-29 Jet Engine</span> — Sovyet R-29 jet motorunun tersine mühendislikle yeniden çizimi.</a>
+        </div>
+        <div class="flex gap-3">
+          <span class="text-indigo-400 flex-shrink-0">→</span>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_nonlinerar-neuro-regression-modeling-and-activity-6985964906550312960-a8Gr" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Neuro Regression Modeling</span> — Makine öğrenmesi destekli doğrusal olmayan regresyon modeli.</a>
+        </div>
       </div>
     </section>
 
     <!-- ── Skills ── -->
     <section>
-      <h2 class="text-xl font-semibold text-white mb-4 pb-2 border-b border-white/10">Skills & Tools</h2>
-      <div class="grid sm:grid-cols-2 gap-4">
-        {[
-          { cat: 'CAD / FEA', items: ['SolidWorks (Advanced)', 'AutoCAD (Intermediate)', 'Ansys (Intermediate)'] },
-          { cat: 'Simulation & CFD', items: ['MATLAB (Advanced)', 'Mathematica (Advanced)', 'OpenFOAM / CFD'] },
-          { cat: 'Programming', items: ['Python', 'MATLAB scripting', 'ML-based optimization'] },
-          { cat: 'Other', items: ['MS Office (Advanced)', 'FEM analysis', 'Jet engine design'] },
-        ].map(group => (
-          <div class="bg-slate-900/50 border border-white/5 rounded-xl p-4">
-            <p class="text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">{group.cat}</p>
-            <div class="flex flex-wrap gap-1.5">
-              {group.items.map(item => (
-                <span class="text-xs px-2.5 py-1 bg-slate-800 text-slate-300 rounded-full border border-slate-700">{item}</span>
-              ))}
-            </div>
-          </div>
+      <h2 class="text-lg font-semibold text-white mb-4 pb-2 border-b border-white/10">Araçlar & Yöntemler</h2>
+      <div class="flex flex-wrap gap-2">
+        {['SolidWorks', 'AutoCAD', 'Ansys', 'MATLAB', 'Mathematica', 'OpenFOAM', 'Python', 'CFD', 'FEM', 'RANS / LES', 'MS Office'].map(s => (
+          <span class="text-xs px-2.5 py-1 bg-slate-800 text-slate-300 rounded-full border border-slate-700">{s}</span>
         ))}
       </div>
     </section>
 
     <!-- ── Languages ── -->
     <section>
-      <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">Languages</h2>
-      <div class="flex flex-wrap gap-3">
-        <span class="text-sm text-slate-400">🇹🇷 Turkish — Native</span>
-        <span class="text-sm text-slate-400">🇬🇧 English — Professional (C1)</span>
-      </div>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">Diller</h2>
+      <p class="text-sm text-slate-400">🇹🇷 Türkçe — Anadil &nbsp;·&nbsp; 🇬🇧 İngilizce — İleri (C1)</p>
     </section>
 
     <!-- ── Social responsibility ── -->
     <section>
-      <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">Social Responsibility</h2>
-      <ul class="text-sm text-slate-400 space-y-1 list-disc list-inside">
-        <li>Antalya Municipality — Disaster Relief Volunteer (06–12 Feb 2023)</li>
-        <li>Antalya TMMOB — Disaster Aid & Coordination (11 Feb 2023)</li>
-      </ul>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">Sosyal Sorumluluk</h2>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        2023 yılı Şubat ayındaki deprem felaketinin ardından Antalya Büyükşehir Belediyesi bünyesinde
+        afet yardım gönüllüsü olarak sahada çalıştı (06–12 Şubat). Antalya TMMOB koordinasyon
+        çalışmalarına da destek verdi (11 Şubat).
+      </p>
     </section>
 
     <!-- ── Hobbies ── -->
     <section>
-      <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">Hobbies & Interests</h2>
-      <div class="flex flex-wrap gap-2">
-        {[
-          'Swimming',
-          'Basketball',
-          'Electric Guitar',
-          'Chess — active tournament player; achieved notable results at the İzmir Beko Tournament representing his university',
-          'Python Game Development',
-        ].map(h => (
-          <span class="text-sm px-3 py-1.5 bg-slate-900/60 border border-white/10 text-slate-300 rounded-full">{h}</span>
-        ))}
-      </div>
-    </section>
-
-    <!-- ── Contact ── -->
-    <section>
-      <h2 class="text-xl font-semibold text-white mb-3 pb-2 border-b border-white/10">Contact</h2>
-      <div class="flex flex-wrap gap-4 text-sm text-slate-400">
-        <a href="mailto:mehmetbatuayan@gmail.com" class="hover:text-white transition-colors">✉️ mehmetbatuayan@gmail.com</a>
-        <a href="https://www.linkedin.com/in/batu-ayan-b63673151?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener" class="hover:text-white transition-colors">🔗 LinkedIn</a>
-      </div>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">İlgi Alanları</h2>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        Yüzme ve basketbol ile aktif spor hayatını sürdüren Batu, elektro gitar çalar.
+        Uzun yıllar boyunca satranç turnuvalarına katıldı; İzmir Beko Turnuvası'nda okulunu
+        temsil ederek başarılı sonuçlar elde etti. Python ile oyun geliştirme de ilgi alanları arasında.
+      </p>
     </section>
 
   </div>
