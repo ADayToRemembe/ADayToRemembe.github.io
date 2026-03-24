@@ -1,81 +1,40 @@
 ---
-interface Props {
-  title: string;
-  subtitle?: string;
-}
-const { title, subtitle } = Astro.props;
+// No props — this component injects a fixed full-page liquid background
+// and a colour-matching overlay. Include it once in a page to cover the
+// entire viewport behind all other content.
 ---
 
-<div class="liquid-hero-wrapper">
-  <canvas id="liquid-canvas"></canvas>
+<canvas id="liquid-canvas"></canvas>
+<div class="liquid-overlay"></div>
 
-  <!-- indigo tint overlay -->
-  <div class="liquid-overlay"></div>
-
-  <!-- text content on top -->
-  <div class="liquid-content">
-    <h1 class="liquid-title">{title}</h1>
-    {subtitle && <p class="liquid-subtitle">{subtitle}</p>}
-  </div>
-</div>
-
-<style>
-  .liquid-hero-wrapper {
-    position: relative;
-    width: 100%;
-    height: 420px;
-    overflow: hidden;
-    background: #0a0a0f;
-  }
-
+<style is:global>
   #liquid-canvas {
-    position: absolute;
+    position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
+    z-index: 0;
     display: block;
+    pointer-events: none;
   }
 
   .liquid-overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: linear-gradient(
-      to bottom,
-      rgba(10, 10, 15, 0.15) 0%,
-      rgba(49, 46, 129, 0.25) 50%,
-      rgba(10, 10, 15, 0.65) 100%
+      160deg,
+      rgba(10, 10, 15, 0.55) 0%,
+      rgba(30, 27, 75, 0.35) 50%,
+      rgba(10, 10, 15, 0.70) 100%
     );
+    z-index: 0;
     pointer-events: none;
-    z-index: 1;
   }
 
-  .liquid-content {
+  /* Lift every direct child of <body> above the liquid background */
+  body > * {
     position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    text-align: center;
-    padding: 0 1.5rem;
-  }
-
-  .liquid-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 0.75rem;
-    text-shadow: 0 2px 24px rgba(99, 102, 241, 0.5);
-    letter-spacing: -0.02em;
-  }
-
-  .liquid-subtitle {
-    font-size: 1.1rem;
-    color: #c7d2fe;
-    max-width: 36rem;
-    line-height: 1.6;
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+    z-index: 1;
   }
 </style>
 
@@ -86,11 +45,7 @@ const { title, subtitle } = Astro.props;
   const canvas = document.getElementById('liquid-canvas');
   if (canvas) {
     const app = LiquidBackground(canvas);
-
-    // Use the stock liquid image; the indigo overlay shifts perceived colour
     app.loadImage('https://assets.codepen.io/33787/liquid.webp');
-
-    // Tune material for a darker, more metallic look that suits the dark site
     app.liquidPlane.material.metalness = 0.85;
     app.liquidPlane.material.roughness = 0.18;
     app.liquidPlane.uniforms.displacementScale.value = 4;

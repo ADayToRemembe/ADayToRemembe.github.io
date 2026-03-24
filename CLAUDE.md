@@ -6,26 +6,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 npm run dev        # Start dev server at localhost:4321
-npm run build      # Production build (type-checks + static generation)
+npm run build      # Production build (static generation to ./dist/)
 npm run preview    # Preview production build locally
+npx astro check    # TypeScript type-check (run separately before build)
 ```
+
+Requires Node >=22.12.0.
 
 ## Tech Stack
 
-- **Astro** (static site generation) + **TypeScript** (strict mode)
+- **Astro 6** (static site generation) + **TypeScript** (strict mode)
+- **React 19** via `@astrojs/react` (for interactive components)
 - **Tailwind CSS v4** via `@tailwindcss/vite` (no tailwind.config.js — configured in CSS)
-- **MDX** for blog posts and project pages with math support
+- **MDX** for blog posts and project pages with math + diagram support
 - **KaTeX** via `remark-math` + `rehype-katex` (imported in `global.css`)
+- **Mermaid** via `mdx-mermaid` for diagrams in MDX
 - **Supabase** for comments (client-side only, no server routes)
+- **CVA pattern**: `class-variance-authority` + `clsx` + `tailwind-merge` + `@radix-ui/react-slot` for typed variant components (shadcn/ui style)
 
 ## Architecture
 
 ### Content System
-Content lives in `src/content/` as `.mdx` files. Two collections are defined in `src/content.config.ts` using the **Astro v5 glob loader** (not the legacy `type: 'content'` API):
+Content lives in `src/content/` as `.mdx` files. Two collections are defined in `src/content.config.ts` using the **Astro glob loader** (not the legacy `type: 'content'` API):
 - `blog/` — posts with `draft`, `math`, `tags` fields
 - `projects/` — with `status` (active/completed/archived), `github`, `paper` links
 
-**Important:** With the glob loader, entries use `entry.id` (not `entry.slug`). All routes and `<PostCard>` components pass `post.id` as the slug prop. Do not use `entry.slug` — it does not exist in Astro v5+.
+**Important:** With the glob loader, entries use `entry.id` (not `entry.slug`). All routes and `<PostCard>` components pass `post.id` as the slug prop. Do not use `entry.slug` — it does not exist in Astro 5+.
 
 Add `math: true` to frontmatter on posts that use KaTeX — this is informational only (KaTeX CSS is always loaded globally).
 
@@ -64,3 +70,10 @@ draft: false      # omit or false to publish
 ### Math syntax (KaTeX)
 - Inline: `$E = mc^2$`
 - Block: `$$\nabla \cdot \mathbf{u} = 0$$`
+
+### Mermaid diagrams (mdx-mermaid)
+```mdx
+import { Mermaid } from 'mdx-mermaid/Mermaid'
+
+<Mermaid chart={`graph TD; A-->B`} />
+```
