@@ -122,7 +122,7 @@ export default function RocketLaunch() {
                 height: 52,
                 left: '50%',
                 /* Rocket bottom is at top:100+80=180px, flame sits just below */
-                top: 182,
+                top: 218,
                 transformOrigin: 'top center',
                 borderRadius: '0 0 60% 60%',
                 background: 'radial-gradient(ellipse at 50% 0%, #fef08a 0%, #f97316 38%, #dc2626 72%, transparent 100%)',
@@ -168,6 +168,7 @@ export default function RocketLaunch() {
             >
               <RocketSVG />
             </div>
+
 
           </div>
         </div>
@@ -269,28 +270,47 @@ function ShootingStar({ i }: { i: number }) {
   );
 }
 
-/* ── Rocket SVG — shape identical to CodePen, indigo palette ── */
+/* ── Rocket SVG — original CodePen design (green/teal palette) ── */
 function RocketSVG() {
   return (
-    <svg width="80" height="160" viewBox="0 0 80 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="80"
+      viewBox="0 0 154.1 259.1"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <style>{`
+        .st0{fill:#18F4A3;}
+        .st1{fill:#E8E6EF;}
+        .st5{opacity:0.61;fill:#CFE0E2;}
+        .st6{opacity:0.7;fill:#012226;}
+        .st10{fill:#F0F3F3;}
+        .st11{fill:#063A3A;}
+        .st12{fill:#049F75;}
+      `}</style>
+      {/* Fins + base */}
+      <path className="st0" d="M97.4 236.1c0 2.6-5.2 4.7-11.7 4.7H70.3c-6.4 0-11.7-2.1-11.7-4.7v-4.5c0-2.6 5.2-4.7 11.7-4.7h15.4c6.4 0 11.7 2.1 11.7 4.7v4.5zM37.1 137.4s-28 19.2-28 32v59.3l30-30-2-61.3zM117.5 137.4s28 19.2 28 32v59.3l-30-30 2-61.3z"/>
+      {/* Main body */}
+      <path className="st1" d="M29.6 140.5c.3 36.4 8.3 69.6 21.3 95.3 8.6-2.8 17.7-4.4 27.2-4.4 9.5-.1 18.6 1.3 27.3 4 12.5-25.9 19.9-59.3 19.6-95.6-.6-57.8-20.4-107.7-48.8-132-28.1 24.8-47.1 75-46.6 132.7z"/>
+      {/* Body highlight */}
+      <path className="st5" d="M60.2 233.7l12-1.9c-18.3-108.4-8.6-169-8.6-169l-11.4.4c-22 76.5 8 170.5 8 170.5z"/>
+      {/* Dark stripe between body and nose */}
+      <path className="st6" d="M41.5 64l-2.1 6.7s40.7-5 75.7.1l-3.2-7.4c-.1 0-47.1-5.4-70.4.6z"/>
       {/* Nose cone */}
-      <path d="M40 6 C30 26 24 50 22 68 L58 68 C56 50 50 26 40 6Z" fill="#e0e7ff"/>
-      {/* Body */}
-      <rect x="22" y="68" width="36" height="62" rx="3" fill="#c7d2fe"/>
-      {/* Stripe */}
-      <rect x="22" y="100" width="36" height="10" fill="#818cf8" opacity="0.6"/>
-      {/* Window */}
-      <circle cx="40" cy="86" r="9" fill="#1e1b4b"/>
-      <circle cx="40" cy="86" r="7" fill="#6366f1" opacity="0.8"/>
-      <circle cx="37" cy="83" r="2.5" fill="white" opacity="0.5"/>
-      {/* Engine */}
-      <path d="M22 130 L17 144 L63 144 L58 130Z" fill="#a5b4fc"/>
-      {/* Nozzle */}
-      <ellipse cx="40" cy="144" rx="14" ry="5" fill="#6366f1"/>
-      {/* Left fin */}
-      <path d="M22 98 L6 130 L22 126Z" fill="#6366f1"/>
-      {/* Right fin */}
-      <path d="M58 98 L74 130 L58 126Z" fill="#6366f1"/>
+      <path className="st0" d="M41.5 64c11.4-.9 23.2-1.4 35.2-1.5 12-.1 23.7.2 35.2.9-8.6-23.7-21-43-35.6-55.6C61.7 20.6 49.7 40.2 41.5 64z"/>
+      {/* Nose highlight */}
+      <path className="st10" d="M63.6 62.7C65.7 35.3 76.2 7.8 76.2 7.8c-18.9 24.2-24 55.3-24 55.3l11.4-.4z"/>
+      {/* Window 1 */}
+      <path className="st11" d="M75.9 78.3c-14.8.1-26.7 12.2-26.6 27 .1 14.8 12.2 26.7 27 26.6 14.8-.1 26.7-12.2 26.5-27-.1-14.9-12.2-26.8-26.9-26.6z"/>
+      <path className="st12" d="M75.9 86.4c-10.3.1-18.5 8.5-18.5 18.8.1 10.3 8.5 18.5 18.8 18.4 10.3-.1 18.5-8.5 18.4-18.8 0-10.2-8.4-18.5-18.7-18.4z"/>
+      <path className="st0" d="M68.6 122.1c2.3 1 4.9 1.6 7.7 1.6 10.3-.1 18.5-8.5 18.4-18.8 0-3.6-1.1-7-3-9.9-.3.3-.7.5-1 .8-8.1 6.6-18.2 15.6-22.1 26.3z"/>
+      {/* Window 2 */}
+      <path className="st11" d="M79 139.9c-11.1.1-20 9.2-19.9 20.3.1 11.1 9.2 20 20.3 19.9 11.1-.1 20-9.2 19.9-20.3-.1-11-9.2-20-20.3-19.9z"/>
+      <path className="st12" d="M79.1 146.1c-7.7.1-13.9 6.4-13.8 14.1.1 7.7 6.4 13.9 14.1 13.8 7.7-.1 13.9-6.4 13.8-14.1-.1-7.7-6.4-13.9-14.1-13.8z"/>
+      <path className="st0" d="M73.5 172.8c1.8.8 3.7 1.2 5.8 1.2 7.7-.1 13.9-6.4 13.8-14.1 0-2.7-.8-5.3-2.2-7.4-.3.2-.5.4-.8.6-6 4.9-13.6 11.7-16.6 19.7z"/>
+      {/* Window 3 */}
+      <path className="st11" d="M81.5 187.9c-7.8.1-14.1 6.5-14 14.3.1 7.8 6.5 14.1 14.3 14.1 7.8-.1 14.1-6.5 14-14.3-.1-7.8-6.5-14.2-14.3-14.1z"/>
+      <path className="st12" d="M81.5 192.2c-5.4 0-9.8 4.5-9.8 9.9s4.5 9.8 9.9 9.8 9.8-4.5 9.8-9.9-4.5-9.8-9.9-9.8z"/>
+      <path className="st0" d="M77.6 211.1c1.2.5 2.6.9 4.1.8 5.4 0 9.8-4.5 9.8-9.9 0-1.9-.6-3.7-1.6-5.2-.2.1-.4.3-.5.4-4.3 3.5-9.7 8.3-11.8 13.9z"/>
     </svg>
   );
 }
