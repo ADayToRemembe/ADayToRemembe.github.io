@@ -15,7 +15,14 @@ const P1_END     = 0.28;   // launch ends sooner → longer cruise
 const TURN_END   = 0.42;   // turn ends at 42%
 const CRUISE_DEG = 30;
 
-export default function RocketLaunch() {
+type Item = { title: string; slug: string; tags: string[] };
+
+interface Props {
+  posts?:    Item[];
+  projects?: Item[];
+}
+
+export default function RocketLaunch({ posts = [], projects = [] }: Props) {
   const sectionRef  = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
   const frameRef    = useRef(0);
@@ -33,6 +40,8 @@ export default function RocketLaunch() {
   const f2Ref        = useRef<HTMLDivElement>(null);
   const f3Ref        = useRef<HTMLDivElement>(null);
   const textRef      = useRef<HTMLDivElement>(null);
+  const postsRef     = useRef<HTMLDivElement>(null);
+  const projectsRef  = useRef<HTMLDivElement>(null);
   const hintRef      = useRef<HTMLDivElement>(null);
 
   const applyFrame = useCallback(() => {
@@ -59,6 +68,8 @@ export default function RocketLaunch() {
     const downStarsOp   = clamp(launchP * 3, 0, 1) * (1 - turnP);
     const cruiseStarsOp = turnP;
     const textOp        = clamp((p - TURN_END - 0.05) / 0.15, 0, 1);
+    const postsOp       = clamp((cruiseP - 0.30) / 0.20, 0, 1);
+    const projectsOp    = clamp((cruiseP - 0.60) / 0.20, 0, 1);
 
     const s = (el: HTMLDivElement | null, styles: Partial<CSSStyleDeclaration>) => {
       if (!el) return;
@@ -83,6 +94,14 @@ export default function RocketLaunch() {
     s(textRef.current, {
       opacity:       String(textOp),
       pointerEvents: textOp > 0 ? 'auto' : 'none',
+    });
+    s(postsRef.current, {
+      opacity:       String(postsOp),
+      pointerEvents: postsOp > 0 ? 'auto' : 'none',
+    });
+    s(projectsRef.current, {
+      opacity:       String(projectsOp),
+      pointerEvents: projectsOp > 0 ? 'auto' : 'none',
     });
     s(hintRef.current, { opacity: String(p < 0.06 ? 1 - p / 0.06 : 0) });
   }, []);
@@ -230,27 +249,92 @@ export default function RocketLaunch() {
 
         {/* ── cruise text ── */}
         <div ref={textRef} style={{
-          position: 'absolute', top: '50%', right: '5%',
-          transform: 'translateY(-50%)',
-          textAlign: 'right', maxWidth: '38vw',
+          position: 'absolute', top: '12vh', right: '5%',
+          textAlign: 'right', maxWidth: '40vw',
           opacity: 0, zIndex: 5, pointerEvents: 'none',
         }}>
           <p style={{
-            fontSize: '0.62rem', fontWeight: 700, color: '#818cf8',
-            letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: '0.85rem',
+            fontSize: '0.6rem', fontWeight: 700, color: '#818cf8',
+            letterSpacing: '0.22em', textTransform: 'uppercase', marginBottom: '0.6rem',
           }}>Engineering in Motion</p>
           <h2 style={{
-            fontSize: 'clamp(1.6rem,3.5vw,3rem)', fontWeight: 700, color: '#fff',
-            lineHeight: 1.15, marginBottom: '1rem',
+            fontSize: 'clamp(1.4rem,2.8vw,2.4rem)', fontWeight: 700, color: '#fff',
+            lineHeight: 1.15, marginBottom: '0.75rem',
             textShadow: '0 2px 24px rgba(99,102,241,0.5)',
           }}>
             Pushing the boundaries<br />of engineering.
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.92rem', lineHeight: 1.65 }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.82rem', lineHeight: 1.6 }}>
             Research in CFD, turbulence modelling, and eco-friendly HVAC —
             grounded in the governing equations of fluid mechanics.
           </p>
         </div>
+
+        {/* ── posts panel (cruise mid) ── */}
+        {posts.length > 0 && (
+          <div ref={postsRef} style={{
+            position: 'absolute', top: '42vh', right: '5%',
+            textAlign: 'right', maxWidth: '40vw',
+            opacity: 0, zIndex: 5, pointerEvents: 'none',
+          }}>
+            <p style={{
+              fontSize: '0.58rem', fontWeight: 700, color: '#818cf8',
+              letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '0.6rem',
+            }}>Technical Writing</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.65rem' }}>
+              {posts.map(p => (
+                <a key={p.slug} href={`/blog/${p.slug}`} style={{
+                  color: '#e2e8f0', fontSize: '0.82rem', fontWeight: 500,
+                  textDecoration: 'none', display: 'flex', alignItems: 'center',
+                  justifyContent: 'flex-end', gap: '0.5rem',
+                }}>
+                  {p.tags[0] && (
+                    <span style={{ fontSize: '0.6rem', color: '#6366f1', background: 'rgba(99,102,241,0.12)',
+                      padding: '1px 6px', borderRadius: 4 }}>{p.tags[0]}</span>
+                  )}
+                  <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>→</span>
+                  {p.title}
+                </a>
+              ))}
+            </div>
+            <a href="/blog" style={{ fontSize: '0.72rem', color: '#6366f1', textDecoration: 'none' }}>
+              All posts →
+            </a>
+          </div>
+        )}
+
+        {/* ── projects panel (cruise late) ── */}
+        {projects.length > 0 && (
+          <div ref={projectsRef} style={{
+            position: 'absolute', top: '68vh', right: '5%',
+            textAlign: 'right', maxWidth: '40vw',
+            opacity: 0, zIndex: 5, pointerEvents: 'none',
+          }}>
+            <p style={{
+              fontSize: '0.58rem', fontWeight: 700, color: '#818cf8',
+              letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '0.6rem',
+            }}>Research Work</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', marginBottom: '0.65rem' }}>
+              {projects.map(p => (
+                <a key={p.slug} href={`/projects/${p.slug}`} style={{
+                  color: '#e2e8f0', fontSize: '0.82rem', fontWeight: 500,
+                  textDecoration: 'none', display: 'flex', alignItems: 'center',
+                  justifyContent: 'flex-end', gap: '0.5rem',
+                }}>
+                  {p.tags[0] && (
+                    <span style={{ fontSize: '0.6rem', color: '#6366f1', background: 'rgba(99,102,241,0.12)',
+                      padding: '1px 6px', borderRadius: 4 }}>{p.tags[0]}</span>
+                  )}
+                  <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>→</span>
+                  {p.title}
+                </a>
+              ))}
+            </div>
+            <a href="/projects" style={{ fontSize: '0.72rem', color: '#6366f1', textDecoration: 'none' }}>
+              All projects →
+            </a>
+          </div>
+        )}
 
         {/* ── scroll hint ── */}
         <div ref={hintRef} style={{

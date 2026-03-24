@@ -12,7 +12,7 @@ export function getLangPrefix(lang: Lang): string {
 }
 
 type TranslationKey =
-  | 'nav.home' | 'nav.blog' | 'nav.projects' | 'nav.about'
+  | 'nav.home' | 'nav.blog' | 'nav.projects' | 'nav.about' | 'nav.games'
   | 'footer.rights'
   | 'hero.badge' | 'hero.line1' | 'hero.line2' | 'hero.subtitle' | 'hero.primary' | 'hero.secondary'
   | 'home.intro.heading' | 'home.intro.text'
@@ -38,6 +38,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'nav.blog': 'Blog',
     'nav.projects': 'Projects',
     'nav.about': 'About',
+    'nav.games': 'Games',
     'footer.rights': 'Mechanical Engineering & CFD Research',
     'hero.badge': 'Mechanical Engineer & CFD Researcher',
     'hero.line1': 'Pushing the Boundaries',
@@ -90,6 +91,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'nav.blog': 'Blog',
     'nav.projects': 'Projeler',
     'nav.about': 'Hakkımda',
+    'nav.games': 'Oyunlar',
     'footer.rights': 'Makine Mühendisliği & CFD Araştırmaları',
     'hero.badge': 'Makine Mühendisi & CFD Araştırmacısı',
     'hero.line1': 'Mühendisliğin Sınırlarını',
@@ -142,6 +144,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'nav.blog': 'Blog',
     'nav.projects': 'Projekte',
     'nav.about': 'Über mich',
+    'nav.games': 'Spiele',
     'footer.rights': 'Maschinenbau & CFD-Forschung',
     'hero.badge': 'Maschinenbauingenieur & CFD-Forscher',
     'hero.line1': 'Die Grenzen des Ingenieurwesens',
@@ -194,6 +197,7 @@ export const ui: Record<Lang, Record<TranslationKey, string>> = {
     'nav.blog': 'Блог',
     'nav.projects': 'Проекты',
     'nav.about': 'Обо мне',
+    'nav.games': 'Игры',
     'footer.rights': 'Машиностроение и CFD-исследования',
     'hero.badge': 'Инженер-механик & CFD-исследователь',
     'hero.line1': 'Расширяя границы',
