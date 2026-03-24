@@ -1,42 +1,11 @@
 ---
-// No props — this component injects a fixed full-page liquid background
-// and a colour-matching overlay. Include it once in a page to cover the
-// entire viewport behind all other content.
+// Full-page liquid background.
+// Requires the consuming page to set body { background: transparent }
+// so the z:-1 fixed canvas is visible. See about.astro for the page-level style.
 ---
 
 <canvas id="liquid-canvas"></canvas>
-<div class="liquid-overlay"></div>
-
-<style is:global>
-  #liquid-canvas {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    display: block;
-    pointer-events: none;
-  }
-
-  .liquid-overlay {
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(
-      160deg,
-      rgba(10, 10, 15, 0.55) 0%,
-      rgba(30, 27, 75, 0.35) 50%,
-      rgba(10, 10, 15, 0.70) 100%
-    );
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  /* Lift every direct child of <body> above the liquid background */
-  body > * {
-    position: relative;
-    z-index: 1;
-  }
-</style>
+<div id="liquid-overlay"></div>
 
 <script type="module">
   import LiquidBackground from
