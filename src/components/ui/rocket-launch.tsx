@@ -50,12 +50,7 @@ export default function RocketLaunch() {
       <div className="relative z-10 flex flex-col items-center gap-14">
 
         {/* ──────────── ARTBOARD ──────────── */}
-        <div
-          style={{
-            transition: gone ? 'transform 0.4s ease-in-out' : 'none',
-            transform:  gone ? 'rotate(40deg)' : 'rotate(0deg)',
-          }}
-        >
+        <div>
           <div
             className="artboard"
             style={{
@@ -92,24 +87,24 @@ export default function RocketLaunch() {
               ))}
             </div>
 
-            {/* Smoke */}
+            {/* Smoke — large visible cloud under the nozzle */}
             <div
               style={{
                 position: 'absolute',
-                width: 130,
-                height: 70,
+                width: 160,
+                height: 90,
                 borderRadius: '50%',
                 left: '50%',
-                bottom: 30,
+                bottom: 10,
                 transform: launch
-                  ? 'translateX(-50%) translateY(-20px) scale(2.2)'
+                  ? 'translateX(-50%) translateY(-30px) scale(2.4)'
                   : 'translateX(-50%) translateY(0) scale(1)',
-                opacity: ignite ? (gone ? 0 : 0.85) : 0,
-                background: 'radial-gradient(ellipse, rgba(148,163,184,0.4) 0%, rgba(100,116,139,0.15) 55%, transparent 80%)',
-                filter: 'blur(8px)',
+                opacity: ignite ? (gone ? 0 : 1) : 0,
+                background: 'radial-gradient(ellipse, rgba(230,235,245,0.85) 0%, rgba(200,210,230,0.55) 45%, transparent 80%)',
+                filter: 'blur(10px)',
                 transition: launch
-                  ? 'transform 2.5s ease-out, opacity 1.8s ease 0.8s'
-                  : 'opacity 0.5s ease',
+                  ? 'transform 2.5s ease-out, opacity 2s ease 0.6s'
+                  : 'opacity 0.4s ease',
                 zIndex: 1,
               }}
             />
@@ -153,15 +148,9 @@ export default function RocketLaunch() {
                 top: 100,
                 marginLeft: -40,
                 zIndex: 3,
-                transform: launch
-                  ? gone
-                    ? 'translateY(-300px) rotate(40deg)'
-                    : 'translateY(-300px)'
-                  : 'translateY(0)',
+                transform: launch ? 'translateY(-200px)' : 'translateY(0)',
                 transition: launch
-                  ? gone
-                    ? 'transform 1.2s cubic-bezier(0.4,0,0.2,1)'
-                    : 'transform 1.4s cubic-bezier(0.2,0,0.05,1)'
+                  ? 'transform 1.6s cubic-bezier(0.2,0,0.05,1)'
                   : 'none',
                 animation: ignite && !launch ? 'rocketShake 0.12s ease-in-out infinite' : 'none',
               }}
@@ -279,13 +268,13 @@ function RocketSVG() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <style>{`
-        .st0{fill:#18F4A3;}
-        .st1{fill:#E8E6EF;}
-        .st5{opacity:0.61;fill:#CFE0E2;}
-        .st6{opacity:0.7;fill:#012226;}
-        .st10{fill:#F0F3F3;}
-        .st11{fill:#063A3A;}
-        .st12{fill:#049F75;}
+        .st0{fill:#1d4ed8;}
+        .st1{fill:#f0f4ff;}
+        .st5{opacity:0.55;fill:#bfdbfe;}
+        .st6{opacity:0.7;fill:#1e3a8a;}
+        .st10{fill:#eff6ff;}
+        .st11{fill:#1e3a8a;}
+        .st12{fill:#3b82f6;}
       `}</style>
       {/* Fins + base */}
       <path className="st0" d="M97.4 236.1c0 2.6-5.2 4.7-11.7 4.7H70.3c-6.4 0-11.7-2.1-11.7-4.7v-4.5c0-2.6 5.2-4.7 11.7-4.7h15.4c6.4 0 11.7 2.1 11.7 4.7v4.5zM37.1 137.4s-28 19.2-28 32v59.3l30-30-2-61.3zM117.5 137.4s28 19.2 28 32v59.3l-30-30 2-61.3z"/>
