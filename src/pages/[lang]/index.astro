@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import AnimatedShaderHero from '../../components/ui/animated-shader-hero';
+import RocketLaunch from '../../components/ui/rocket-launch';
 import { getCollection } from 'astro:content';
 import { type Lang, ui } from '../../i18n/translations';
 
@@ -41,6 +42,9 @@ const recentProjects = allProjects
       secondary: { text: T['hero.secondary'], href: `${prefix}/projects` },
     }}
   />
+
+  <!-- ROCKET LAUNCH SECTION -->
+  <RocketLaunch client:visible />
 
   <!-- ABOUT / INTRO SECTION -->
   <section class="py-24 px-6 border-b border-white/5">
