@@ -1,10 +1,12 @@
 ---
 // Full-page liquid background.
-// Requires the consuming page to set body { background: transparent }
-// so the z:-1 fixed canvas is visible. See about.astro for the page-level style.
+// The canvas is wrapped in a fixed full-viewport div so the library's
+// size:"parent" reads full viewport dimensions instead of the layout container.
 ---
 
-<canvas id="liquid-canvas"></canvas>
+<div id="liquid-wrap">
+  <canvas id="liquid-canvas"></canvas>
+</div>
 <div id="liquid-overlay"></div>
 
 <script type="module">
