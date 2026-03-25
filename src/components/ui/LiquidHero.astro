@@ -14,10 +14,9 @@
   const canvas = document.getElementById('liquid-canvas');
   if (canvas) {
     const app = LiquidBackground(canvas);
-    app.loadImage('https://assets.codepen.io/33787/liquid.webp');
-    app.liquidPlane.material.metalness = 0.85;
-    app.liquidPlane.material.roughness = 0.18;
-    app.liquidPlane.uniforms.displacementScale.value = 4;
+    app.liquidPlane.material.metalness = 0.92;
+    app.liquidPlane.material.roughness = 0.12;
+    app.liquidPlane.uniforms.displacementScale.value = 3;
     app.setRain(false);
   }
 </script>
