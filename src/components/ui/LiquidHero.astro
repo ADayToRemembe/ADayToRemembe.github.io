@@ -12,11 +12,31 @@
     'https://cdn.jsdelivr.net/npm/threejs-components@0.0.27/build/backgrounds/liquid1.min.js';
 
   const canvas = document.getElementById('liquid-canvas');
-  if (canvas) {
-    const app = LiquidBackground(canvas);
-    app.liquidPlane.material.metalness = 0.92;
-    app.liquidPlane.material.roughness = 0.12;
-    app.liquidPlane.uniforms.displacementScale.value = 3;
-    app.setRain(false);
-  }
+  if (!canvas) return;
+
+  // Set explicit pixel dimensions before Three.js initialises
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const app = LiquidBackground(canvas);
+  app.loadImage('/reflection-pond.jpg');
+  app.liquidPlane.material.metalness = 0.88;
+  app.liquidPlane.material.roughness = 0.14;
+  app.liquidPlane.uniforms.displacementScale.value = 3.5;
+  app.setRain(false);
+
+  // Keep the renderer filling the full viewport on resize
+  window.addEventListener('resize', () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width  = w;
+    canvas.height = h;
+    if (app.renderer) {
+      app.renderer.setSize(w, h, false);
+    }
+    if (app.camera) {
+      app.camera.aspect = w / h;
+      app.camera.updateProjectionMatrix();
+    }
+  }, { passive: true });
 </script>
