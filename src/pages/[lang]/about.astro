@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LiquidHero from '../../components/ui/LiquidHero.astro';
-import { type Lang, ui } from '../../i18n/translations';
+import { type Lang } from '../../i18n/translations';
 
 export function getStaticPaths() {
   return [
@@ -12,29 +12,129 @@ export function getStaticPaths() {
 }
 
 const { lang } = Astro.params as { lang: Lang };
-const T = ui[lang];
+
+type AboutContent = {
+  title: string;
+  description: string;
+  subtitle: string;
+  bio: string[];
+  projectsHeading: string;
+  projects: { label: string; desc: string; href?: string }[];
+  toolsHeading: string;
+  langsHeading: string;
+  langsText: string;
+  socialHeading: string;
+  socialText: string;
+  hobbiesHeading: string;
+  hobbiesText: string;
+};
+
+const content: Record<'tr' | 'de' | 'ru', AboutContent> = {
+  tr: {
+    title: 'Hakkımda — B_AYAN',
+    description: 'Makine Mühendisi & ITÜ Isı ve Akış Yüksek Lisans adayı. CFD, sıvı yakıtlı roket motorları ve ML destekli optimizasyon.',
+    subtitle: 'Makine Mühendisi · Isı & Akış Yüksek Lisans',
+    bio: [
+      'Mehmet Batu, İzmir Katip Çelebi Üniversitesi Makine Mühendisliği bölümünden mezun olmasının ardından İstanbul Teknik Üniversitesi\'nde Isı ve Akış alanında yüksek lisansını tamamladı. Tez döneminde ASTRAL bünyesinde sıvı yakıtlı roket motorlarının parametrik tasarım algoritması üzerinde çalışmakta; tez dışında da gönüllü olarak ASTRAL\'de ayrı bir araştırma projesi geliştirmeye devam etmektedir. Hesaplamalı Akışkanlar Dinamiği, Sonlu Elemanlar Yöntemi, gaz türbinleri ve jet motor tasarımı üzerine ileri düzey dersler aldı; IAC 2026 roket projesinde takım lideri olarak görev yapmaktadır.',
+      'Akademik kariyerinin yanında sektörde de aktif rol üstlendi. Kanser hastaları için inşa edilen 13 katlı bir hastane otelinde şantiye şefliği yaptı: sıhhi tesisat, yangın söndürme, yalıtım ve havalandırma sistemlerini koordine ederek projeyi teslim etti. Daha önce bir aydınlatma firmasında tasarım mühendisi olarak görsel tasarım ve tersine mühendislik çalışmaları yürüttü; iki ayrı stajda dişli tasarımı ve HVAC üretim süreçlerini deneyimledi.',
+      'Yüzme ve basketbol ile aktif spor hayatını sürdüren Batu, elektro gitar çalar. Uzun yıllar boyunca satranç turnuvalarına katıldı; İzmir Beko Turnuvası\'nda okulunu temsil ederek başarılı sonuçlar elde etti. Python ile oyun geliştirme de ilgi alanları arasında.',
+    ],
+    projectsHeading: 'Projeler',
+    projects: [
+      { label: 'IAC 2026 Roket Projesi', desc: 'Takım lideri olarak uluslararası astronotik kongre kapsamında roket sistemi geliştiriyor.' },
+      { label: 'Gauss-Seidel Iteration', desc: 'MATLAB ile analitik ve iteratif ısı transferi çözümü.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_matlab-code-and-graph-activity-6942095121848877056-o8MS' },
+      { label: 'Transient Heat Transfer', desc: 'Katı cisim için zamanla değişen ısı transferi simülasyonu (CFD).', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_cfd-activity-6935890485097938944-rxOo' },
+      { label: 'R-29 Jet Engine', desc: 'Sovyet R-29 jet motorunun tersine mühendislikle yeniden çizimi.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_r-29-re-drawing-work-activity-6935888211512557568-kqfZ' },
+      { label: 'Neuro Regression Modeling', desc: 'Makine öğrenmesi destekli doğrusal olmayan regresyon modeli.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_nonlinerar-neuro-regression-modeling-and-activity-6985964906550312960-a8Gr' },
+    ],
+    toolsHeading: 'Araçlar & Yöntemler',
+    langsHeading: 'Diller',
+    langsText: '🇹🇷 Türkçe — Anadil \u00a0·\u00a0 🇬🇧 İngilizce — İleri (C1)',
+    socialHeading: 'Sosyal Sorumluluk',
+    socialText: '2023 yılı Şubat ayındaki deprem felaketinin ardından Antalya Büyükşehir Belediyesi bünyesinde afet yardım gönüllüsü olarak sahada çalıştı (6–12 Şubat). Antalya TMMOB koordinasyon çalışmalarına da destek verdi (11 Şubat).',
+    hobbiesHeading: 'İlgi Alanları',
+    hobbiesText: 'Yüzme, basketbol, elektro gitar, satranç turnuvaları ve Python ile oyun geliştirme.',
+  },
+
+  de: {
+    title: 'Über mich — B_AYAN',
+    description: 'Maschinenbauingenieur & MSc-Kandidat in Wärme und Strömung an der ITÜ. Spezialisierung auf CFD, flüssigkeitsbetriebene Raketentriebwerke und ML-gestützte Optimierung.',
+    subtitle: 'Maschinenbauingenieur · MSc Wärme & Strömung',
+    bio: [
+      'Mehmet Batu schloss sein Studium der Maschinentechnik an der Universität Izmir Katip Celebi ab und erwarb seinen MSc in Wärme & Strömung an der Istanbul Technical University. Im Rahmen seiner Abschlussarbeit arbeitete er bei ASTRAL an einem parametrischen Entwurfsalgorithmus für flüssigkeitsbetriebene Raketentriebwerke — und engagiert sich darüber hinaus freiwillig in einem separaten Forschungsprojekt bei ASTRAL. Er hat Fortgeschrittenenkurse in CFD, FEM, Gasturbinen und Strahltriebwerksdesign absolviert und leitet das Raketenteam des IAC-2026-Projekts.',
+      'Neben seiner akademischen Laufbahn war Batu auch in der Industrie aktiv. Er leitete als Bauleiter ein 13-stöckiges Krankenhaus-Hotel für Krebspatienten und koordinierte dabei Sanitär-, Brandschutz-, Dämm- und HLK-Systeme bis zur Projektübergabe. Zuvor arbeitete er als Konstruktionsingenieur in einem Beleuchtungsunternehmen und führte Visualisierungsdesign und Reverse Engineering durch; in zwei Praktika sammelte er Erfahrungen in Zahnraddesign und HLK-Fertigung.',
+      'Als aktiver Schwimmer und Basketballspieler spielt Batu auch E-Gitarre. Er hat viele Jahre an Schachturnieren teilgenommen und seine Schule beim Izmir Beko Turnier mit guten Ergebnissen vertreten. Die Spieleentwicklung mit Python gehört ebenfalls zu seinen Interessen.',
+    ],
+    projectsHeading: 'Projekte',
+    projects: [
+      { label: 'IAC 2026 Raketenprojekt', desc: 'Leitung der internationalen Raketenentwicklung als Teamleiter für den Internationalen Astronautischen Kongress 2026.' },
+      { label: 'Gauss-Seidel Iteration', desc: 'Analytische und iterative Wärmeübertragungslösung mit MATLAB.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_matlab-code-and-graph-activity-6942095121848877056-o8MS' },
+      { label: 'Transient Heat Transfer', desc: 'Zeitabhängige Wärmeübertragungssimulation für einen Festkörper (CFD).', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_cfd-activity-6935890485097938944-rxOo' },
+      { label: 'R-29 Strahltriebwerk', desc: 'Reverse-Engineering-Neuzeichnung des sowjetischen R-29-Strahltriebwerks.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_r-29-re-drawing-work-activity-6935888211512557568-kqfZ' },
+      { label: 'Neuro Regression Modeling', desc: 'Nichtlineares Regressionsmodell mit maschinellem Lernen.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_nonlinerar-neuro-regression-modeling-and-activity-6985964906550312960-a8Gr' },
+    ],
+    toolsHeading: 'Werkzeuge & Methoden',
+    langsHeading: 'Sprachen',
+    langsText: '🇹🇷 Türkisch — Muttersprache \u00a0·\u00a0 🇬🇧 Englisch — Fortgeschritten (C1)',
+    socialHeading: 'Soziales Engagement',
+    socialText: 'Nach dem verheerenden Erdbeben im Februar 2023 leistete Batu Katastrophenhilfe als Freiwilliger unter der Großstadtgemeinde Antalya (6.–12. Februar) und unterstützte die TMMOB-Koordinationsarbeit in Antalya (11. Februar).',
+    hobbiesHeading: 'Interessen',
+    hobbiesText: 'Schwimmen, Basketball, E-Gitarre, Schachturniere und Spieleentwicklung mit Python.',
+  },
+
+  ru: {
+    title: 'Обо мне — B_AYAN',
+    description: 'Инженер-механик и кандидат MSc по теплу и потоку в ИТУ. Специализация: CFD, жидкостные ракетные двигатели и ML-оптимизация.',
+    subtitle: 'Инженер-механик · Магистр тепло- и газодинамики',
+    bio: [
+      'Мехмет Бату окончил факультет машиностроения Университета Измир Катип Челеби и получил степень магистра по направлению «Тепло и поток» в Стамбульском техническом университете. В ходе написания диссертации он работал в ASTRAL над параметрическим алгоритмом проектирования ракетных двигателей на жидком топливе — и продолжает участвовать там в качестве добровольца в отдельном исследовательском проекте помимо диссертации. Он прошёл курсы повышения квалификации по CFD, МКЭ, газовым турбинам и проектированию реактивных двигателей, а также является руководителем ракетной команды проекта IAC 2026.',
+      'Наряду с академической карьерой Бату активно работал в промышленности. Он занимал должность начальника строительства на 13-этажном отеле при онкологической больнице, координируя системы водоснабжения, пожаротушения, теплоизоляции и вентиляции вплоть до сдачи объекта. Ранее он работал конструктором в компании по производству осветительного оборудования, занимаясь визуальным проектированием и реверс-инжинирингом; во время двух стажировок получил опыт в области проектирования зубчатых передач и производства систем HVAC.',
+      'Бату активно занимается плаванием и баскетболом, а также играет на электрогитаре. Многие годы он участвовал в шахматных турнирах, защищая честь своей школы на турнире Измир Беко с высокими результатами. Разработка игр на Python также входит в круг его интересов.',
+    ],
+    projectsHeading: 'Проекты',
+    projects: [
+      { label: 'Ракетный проект IAC 2026', desc: 'Руководство международной разработкой ракетной системы в качестве лидера команды для Международного астронавтического конгресса 2026.' },
+      { label: 'Итерация Гаусса–Зейделя', desc: 'Аналитическое и итерационное решение теплопередачи с помощью MATLAB.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_matlab-code-and-graph-activity-6942095121848877056-o8MS' },
+      { label: 'Нестационарная теплопередача', desc: 'Симуляция нестационарной теплопередачи для твёрдого тела (CFD).', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_cfd-activity-6935890485097938944-rxOo' },
+      { label: 'Реактивный двигатель Р-29', desc: 'Перечерчивание советского реактивного двигателя Р-29 методом реверс-инжиниринга.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_r-29-re-drawing-work-activity-6935888211512557568-kqfZ' },
+      { label: 'Нейро-регрессионное моделирование', desc: 'Нелинейная регрессионная модель с поддержкой машинного обучения.', href: 'https://www.linkedin.com/posts/batu-ayan-b63673151_nonlinerar-neuro-regression-modeling-and-activity-6985964906550312960-a8Gr' },
+    ],
+    toolsHeading: 'Инструменты и методы',
+    langsHeading: 'Языки',
+    langsText: '🇹🇷 Турецкий — родной \u00a0·\u00a0 🇬🇧 Английский — продвинутый (C1)',
+    socialHeading: 'Социальная ответственность',
+    socialText: 'После разрушительного землетрясения в феврале 2023 года Бату работал добровольцем в службе ликвидации последствий катастрофы при администрации Большого Анталии (6–12 февраля) и оказывал поддержку координационной работе TMMOB в Анталии (11 февраля).',
+    hobbiesHeading: 'Интересы',
+    hobbiesText: 'Плавание, баскетбол, электрогитара, шахматные турниры и разработка игр на Python.',
+  },
+};
+
+const C = content[lang as 'tr' | 'de' | 'ru'];
 ---
 
 <BaseLayout
-  title={`${T['about.heading']} — B_AYAN`}
-  description={T['about.bio']}
+  title={C.title}
+  description={C.description}
   lang={lang}
 >
-  <!-- Full-page liquid background -->
   <LiquidHero />
 
   <style is:global>
     body { background-color: transparent !important; }
     html { background-color: #0a0a0f; }
 
-    #liquid-canvas {
+    #liquid-wrap {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
       z-index: -1;
       pointer-events: none;
-      filter: saturate(1.15) brightness(0.70);
+    }
+    #liquid-canvas {
+      width: 100%;
+      height: 100%;
+      filter: saturate(1.2) brightness(0.65);
     }
     #liquid-overlay {
       position: fixed;
@@ -50,33 +150,85 @@ const T = ui[lang];
     }
   </style>
 
-  <div class="max-w-2xl">
-    <div class="prose">
-      <p>{T['about.bio']}</p>
+  <div class="max-w-2xl space-y-12">
 
-      <h2>{T['about.interests.heading']}</h2>
-      <ul>
-        <li>{T['about.interests.1']}</li>
-        <li>{T['about.interests.2']}</li>
-        <li>{T['about.interests.3']}</li>
-        <li>{T['about.interests.4']}</li>
-      </ul>
-
-      <h2>{T['about.tools.heading']}</h2>
-      <ul>
-        <li>{T['about.tools.1']}</li>
-        <li>{T['about.tools.2']}</li>
-        <li>{T['about.tools.3']}</li>
-        <li>{T['about.tools.4']}</li>
-      </ul>
-
-      <h2>{T['about.contact.heading']}</h2>
-      <p>
-        {T['about.contact.text']}{' '}
-        <a href="https://www.linkedin.com/in/batu-ayan-b63673151" target="_blank" rel="noopener">LinkedIn</a>{' '}
-        {T['about.contact.or']}{' '}
-        <a href="https://github.com/adaytoremembe" target="_blank" rel="noopener">GitHub</a>.
-      </p>
+    <!-- ── Hero ── -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+      <img
+        src="/logo.png"
+        alt="Mehmet Batu AYAN"
+        class="w-24 h-24 rounded-full object-cover border-2 border-indigo-500/40 flex-shrink-0"
+      />
+      <div>
+        <h1 class="text-3xl font-bold text-white mb-1">Mehmet Batu AYAN</h1>
+        <p class="text-indigo-400 font-medium mb-2">{C.subtitle}</p>
+        <div class="flex flex-wrap gap-3 text-xs text-slate-400">
+          <a href="mailto:mehmetbatuayan@gmail.com" class="hover:text-white transition-colors">✉️ mehmetbatuayan@gmail.com</a>
+          <a href="https://www.linkedin.com/in/batu-ayan-b63673151?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app" target="_blank" rel="noopener" class="hover:text-white transition-colors">🔗 LinkedIn</a>
+        </div>
+      </div>
     </div>
+
+    <!-- ── Bio ── -->
+    <section class="prose prose-invert prose-slate max-w-none text-slate-300 leading-relaxed space-y-4">
+      {C.bio.map(para => (
+        lang === 'tr' ? (
+          <p set:html={para.replace(
+            'ASTRAL',
+            '<a href="https://astralteam.itu.edu.tr/contributors.html" target="_blank" rel="noopener" class="text-indigo-400 hover:text-indigo-300 no-underline">ASTRAL</a>'
+          )} />
+        ) : (
+          <p>{para}</p>
+        )
+      ))}
+    </section>
+
+    <!-- ── Projects ── -->
+    <section>
+      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">{C.projectsHeading}</h2>
+      <div class="space-y-3 text-sm text-slate-300">
+        {C.projects.map(p => (
+          <div class="flex gap-3">
+            <span class="text-indigo-400 flex-shrink-0">→</span>
+            {p.href ? (
+              <a href={p.href} target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors">
+                <span class="text-white font-medium">{p.label}</span> — {p.desc}
+              </a>
+            ) : (
+              <span><span class="text-white font-medium">{p.label}</span> — {p.desc}</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ── Skills ── -->
+    <section>
+      <h2 class="text-lg font-semibold text-white mb-4 pb-2 border-b border-white/10">{C.toolsHeading}</h2>
+      <div class="flex flex-wrap gap-2">
+        {['SolidWorks', 'AutoCAD', 'Ansys', 'MATLAB', 'Mathematica', 'OpenFOAM', 'Python', 'CFD', 'FEM', 'RANS / LES', 'MS Office'].map(s => (
+          <span class="text-xs px-2.5 py-1 bg-slate-800/70 text-slate-300 rounded-full border border-slate-700/60">{s}</span>
+        ))}
+      </div>
+    </section>
+
+    <!-- ── Languages ── -->
+    <section>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">{C.langsHeading}</h2>
+      <p class="text-sm text-slate-300" set:html={C.langsText} />
+    </section>
+
+    <!-- ── Social responsibility ── -->
+    <section>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">{C.socialHeading}</h2>
+      <p class="text-sm text-slate-300 leading-relaxed">{C.socialText}</p>
+    </section>
+
+    <!-- ── Hobbies ── -->
+    <section>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">{C.hobbiesHeading}</h2>
+      <p class="text-sm text-slate-300 leading-relaxed">{C.hobbiesText}</p>
+    </section>
+
   </div>
 </BaseLayout>

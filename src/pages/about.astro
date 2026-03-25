@@ -7,15 +7,12 @@ import LiquidHero from '../components/ui/LiquidHero.astro';
   title="About — B_AYAN"
   description="Mechanical Engineer & MSc candidate in Heat and Fluid at ITU. Specializing in CFD, liquid-fuel rocket motors, and ML-driven optimization."
 >
-  <!-- Full-page liquid background -->
   <LiquidHero />
 
   <style is:global>
-    /* Make body transparent so the z:-1 fixed canvas is visible beneath it */
     body { background-color: transparent !important; }
     html { background-color: #0a0a0f; }
 
-    /* Wrapper is fixed full-viewport so the library's size:"parent" reads full dimensions */
     #liquid-wrap {
       position: fixed;
       inset: 0;
@@ -65,57 +62,60 @@ import LiquidHero from '../components/ui/LiquidHero.astro';
     <!-- ── Bio ── -->
     <section class="prose prose-invert prose-slate max-w-none text-slate-300 leading-relaxed space-y-4">
       <p>
-        Mehmet Batu, Izmir Katip Celebi University'den Makine Mühendisliği mezuniyetinin ardından
-        Istanbul Technical University'de Isı ve Akış alanında yüksek lisansını tamamladı; tez döneminde
+        Mehmet Batu graduated in Mechanical Engineering from Izmir Katip Celebi University and
+        completed his MSc in Heat & Flow at Istanbul Technical University. During his thesis, he
+        worked within
         <a href="https://astralteam.itu.edu.tr/contributors.html" target="_blank" rel="noopener" class="text-indigo-400 hover:text-indigo-300 no-underline">ASTRAL</a>
-        bünyesinde sıvı yakıtlı roket motorlarının parametrik tasarım algoritması üzerinde çalışmaktadır.
-        Hesaplamalı Akışkanlar Dinamiği, Sonlu Elemanlar Yöntemi, gaz türbinleri ve jet motor tasarımı
-        üzerine ileri düzey dersler aldı; IAC 2026 roket projesinde takım lideri olarak görev yapmaktadır.
+        on a parametric design algorithm for liquid-fueled rocket motors — and continues to
+        volunteer there on a separate research project beyond his thesis. He has taken advanced
+        courses in Computational Fluid Dynamics, Finite Element Methods, gas turbines, and jet
+        engine design, and serves as team leader in the IAC 2026 rocket project.
       </p>
       <p>
-        Akademik kariyerinin yanında sektörde de aktif rol üstlendi. Kanser hastaları için inşa edilen
-        13 katlı bir hastane otelinde şantiye şefliği yaptı: sıhhi tesisat, yangın söndürme, yalıtım ve
-        havalandırma sistemlerini koordine ederek projeyi teslim etti. Daha önce bir aydınlatma firmasında
-        tasarım mühendisi olarak görsel tasarım ve tersine mühendislik çalışmaları yürüttü;
-        iki ayrı stajda dişli tasarımı ve HVAC üretim süreçlerini deneyimledi.
+        Alongside his academic career, Batu has been active in industry. He served as site manager
+        at a 13-story hospital hotel built for cancer patients, coordinating plumbing, fire
+        suppression, insulation, and HVAC systems through to project delivery. He also worked as a
+        design engineer at a lighting company, conducting visual design and reverse engineering; and
+        gained hands-on experience in gear design and HVAC manufacturing through two separate
+        internships.
       </p>
       <p>
-        Yüzme ve basketbol ile aktif spor hayatını sürdüren Batu, elektro gitar çalar.
-        Uzun yıllar boyunca satranç turnuvalarına katıldı; İzmir Beko Turnuvası'nda okulunu
-        temsil ederek başarılı sonuçlar elde etti. Python ile oyun geliştirme de ilgi alanları arasında.
+        An active swimmer and basketball player, Batu also plays electric guitar. He has competed
+        in chess tournaments for many years, representing his school at the Izmir Beko Tournament
+        with strong results. Game development with Python is also among his interests.
       </p>
     </section>
 
     <!-- ── Projects ── -->
     <section>
-      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">Projeler</h2>
+      <h2 class="text-lg font-semibold text-white mb-5 pb-2 border-b border-white/10">Projects</h2>
       <div class="space-y-3 text-sm text-slate-300">
         <div class="flex gap-3">
           <span class="text-indigo-400 flex-shrink-0">→</span>
-          <span><span class="text-white font-medium">IAC 2026 Roket Projesi</span> — Takım lideri olarak uluslararası astronotik kongre kapsamında roket sistemi geliştiriyor.</span>
+          <span><span class="text-white font-medium">IAC 2026 Rocket Project</span> — Leading international rocket system development as team leader for the 2026 International Astronautical Congress.</span>
         </div>
         <div class="flex gap-3">
           <span class="text-indigo-400 flex-shrink-0">→</span>
-          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_matlab-code-and-graph-activity-6942095121848877056-o8MS" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Gauss-Seidel Iteration</span> — MATLAB ile analitik ve iteratif ısı transferi çözümü.</a>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_matlab-code-and-graph-activity-6942095121848877056-o8MS" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Gauss-Seidel Iteration</span> — Analytical and iterative heat transfer solution with MATLAB.</a>
         </div>
         <div class="flex gap-3">
           <span class="text-indigo-400 flex-shrink-0">→</span>
-          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_cfd-activity-6935890485097938944-rxOo" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Transient Heat Transfer</span> — Katı cisim için zamanla değişen ısı transferi simülasyonu (CFD).</a>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_cfd-activity-6935890485097938944-rxOo" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Transient Heat Transfer</span> — Time-dependent heat transfer simulation for a solid body (CFD).</a>
         </div>
         <div class="flex gap-3">
           <span class="text-indigo-400 flex-shrink-0">→</span>
-          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_r-29-re-drawing-work-activity-6935888211512557568-kqfZ" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">R-29 Jet Engine</span> — Sovyet R-29 jet motorunun tersine mühendislikle yeniden çizimi.</a>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_r-29-re-drawing-work-activity-6935888211512557568-kqfZ" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">R-29 Jet Engine</span> — Reverse engineering redraw of the Soviet R-29 jet engine.</a>
         </div>
         <div class="flex gap-3">
           <span class="text-indigo-400 flex-shrink-0">→</span>
-          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_nonlinerar-neuro-regression-modeling-and-activity-6985964906550312960-a8Gr" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Neuro Regression Modeling</span> — Makine öğrenmesi destekli doğrusal olmayan regresyon modeli.</a>
+          <a href="https://www.linkedin.com/posts/batu-ayan-b63673151_nonlinerar-neuro-regression-modeling-and-activity-6985964906550312960-a8Gr" target="_blank" rel="noopener" class="hover:text-indigo-300 transition-colors"><span class="text-white font-medium">Neuro Regression Modeling</span> — Non-linear regression model with machine learning support.</a>
         </div>
       </div>
     </section>
 
     <!-- ── Skills ── -->
     <section>
-      <h2 class="text-lg font-semibold text-white mb-4 pb-2 border-b border-white/10">Araçlar & Yöntemler</h2>
+      <h2 class="text-lg font-semibold text-white mb-4 pb-2 border-b border-white/10">Tools & Methods</h2>
       <div class="flex flex-wrap gap-2">
         {['SolidWorks', 'AutoCAD', 'Ansys', 'MATLAB', 'Mathematica', 'OpenFOAM', 'Python', 'CFD', 'FEM', 'RANS / LES', 'MS Office'].map(s => (
           <span class="text-xs px-2.5 py-1 bg-slate-800/70 text-slate-300 rounded-full border border-slate-700/60">{s}</span>
@@ -125,27 +125,25 @@ import LiquidHero from '../components/ui/LiquidHero.astro';
 
     <!-- ── Languages ── -->
     <section>
-      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">Diller</h2>
-      <p class="text-sm text-slate-300">🇹🇷 Türkçe — Anadil &nbsp;·&nbsp; 🇬🇧 İngilizce — İleri (C1)</p>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">Languages</h2>
+      <p class="text-sm text-slate-300">🇹🇷 Turkish — Native &nbsp;·&nbsp; 🇬🇧 English — Advanced (C1)</p>
     </section>
 
     <!-- ── Social responsibility ── -->
     <section>
-      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">Sosyal Sorumluluk</h2>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">Social Responsibility</h2>
       <p class="text-sm text-slate-300 leading-relaxed">
-        2023 yılı Şubat ayındaki deprem felaketinin ardından Antalya Büyükşehir Belediyesi bünyesinde
-        afet yardım gönüllüsü olarak sahada çalıştı (06–12 Şubat). Antalya TMMOB koordinasyon
-        çalışmalarına da destek verdi (11 Şubat).
+        Following the devastating earthquake in February 2023, Batu volunteered in disaster relief
+        efforts under Antalya Metropolitan Municipality (6–12 February) and supported TMMOB
+        coordination activities in Antalya (11 February).
       </p>
     </section>
 
     <!-- ── Hobbies ── -->
     <section>
-      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">İlgi Alanları</h2>
+      <h2 class="text-lg font-semibold text-white mb-3 pb-2 border-b border-white/10">Interests</h2>
       <p class="text-sm text-slate-300 leading-relaxed">
-        Yüzme ve basketbol ile aktif spor hayatını sürdüren Batu, elektro gitar çalar.
-        Uzun yıllar boyunca satranç turnuvalarına katıldı; İzmir Beko Turnuvası'nda okulunu
-        temsil ederek başarılı sonuçlar elde etti. Python ile oyun geliştirme de ilgi alanları arasında.
+        Swimming, basketball, electric guitar, chess tournaments, and game development with Python.
       </p>
     </section>
 
